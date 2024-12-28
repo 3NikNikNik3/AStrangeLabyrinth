@@ -9,4 +9,6 @@ add_library(src Drawer.hpp
 		Tiles.hpp
 		Tiles.cpp
 		gui.hpp
-		gui.cpp)
+		gui.cpp
+		Math.hpp
+		Math.cpp)
