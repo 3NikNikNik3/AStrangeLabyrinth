@@ -10,7 +10,11 @@ int main() {
     q.update_boards();
     w.update_boards();
 
-    Drawer::draw_see(&q, {1.5f, 1.5f}, -Math::PI / 2, Math::PI / 2, 1000);
+    sf::RenderWindow window(sf::VideoMode({800, 600}), "A strange labyrinth", sf::Style::Resize | sf::Style::Close);
+
+    window.setFramerateLimit(60);
+
+    Drawer::main_draw(&q, window);
 
 	return 0;
 }

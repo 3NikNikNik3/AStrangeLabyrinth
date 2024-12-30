@@ -81,7 +81,7 @@ namespace AStrangeLabyrinth {
             }
 		}
 
-		void draw_line(Ray::Room* root_room, Vector pos, float a, int x) {
+		void draw_line(Ray::Room* root_room, Vector pos, float a, int x, sf::RenderWindow& window, std::pair<sf::Texture&, sf::Texture&> textures) {
             // What draw
 
             int from_ = -1;
@@ -114,13 +114,53 @@ namespace AStrangeLabyrinth {
             }
 
             // Draw
+            if (ans != nullptr) {
+                sf::Texture tx_now;
+                if (ans->type == 4)
+                    tx_now = textures.first;
+                else
+                    tx_now = textures.second;
+
+                sf::Sprite spr(tx_now);
+                spr.setPosition({x, 0.0f});
+                spr.setScale({1.0f, 0.5f});
+
+                window.draw(spr);
+            }
 		}
 
-		void draw_see(Tiles::Tile* tile, Vector pos, float a_see, float how_see, int n) {
+		void draw_see(Tiles::Tile* tile, Vector pos, float a_see, float how_see, int n, sf::RenderWindow& window) {
             Ray::Room root_room = Ray::Room(tile, pos, a_see, how_see);
 
+            auto [w, h] = window.getSize();
+            sf::Texture texture(sf::Vector2u(w, h));
+
+            std::vector<std::uint8_t> pix(w * h * 4);
+            for (int i = 0; i < w * h; ++i) {
+                pix[i * 4] = pix[i * 4 + 1] = pix[i * 4 + 2] = 128;
+                pix[i * 4 + 3] = 255;
+            }
+            texture.update(pix.data());
+
             for (int i = 0; i < n; ++i) {
-                draw_line(&root_room, pos, a_see - how_see + how_see / n * i, i);
+                draw_line(&root_room, pos, a_see - how_see + how_see / n * i, i, window, {texture, texture});
+            }
+		}
+
+		void main_draw(Tiles::Tile* tile, sf::RenderWindow& window) {
+
+
+            while (window.isOpen()) {
+                while (const std::optional event = window.pollEvent()) {
+                    if (event->is<sf::Event::Closed>())
+                        window.close();
+                }
+
+                window.clear(sf::Color::White);
+
+                draw_see(tile, {1.5f, 1.5f}, -Math::PI / 2, Math::PI / 2, 2000, window);
+
+                window.display();
             }
 		}
 	}
