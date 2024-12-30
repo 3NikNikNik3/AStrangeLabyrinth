@@ -16,7 +16,13 @@ namespace AStrangeLabyrinth {
 
             Vector operator-(Vector ob);
 
+            float operator*(Vector ob);
+
+            float len();
+
             float ang();
+
+            Vector rot90();
         };
 
         struct Line {

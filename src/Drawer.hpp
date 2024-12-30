@@ -19,10 +19,11 @@ namespace AStrangeLabyrinth {
                 Line line;
                 std::pair<float, float> angs;
                 float S;
+                Vector perp; // perpendicular
 
                 uchar type; // 0-3 portal, 4 - norm, 5 - door
 
-                Board(Line line, std::pair<float, float> angs, float S, uchar type);
+                Board(Line line, Vector pos, uchar type);
             };
 
             class Room {
@@ -45,7 +46,7 @@ namespace AStrangeLabyrinth {
 
                 Room* room;
 
-                Portal(Line line, std::pair<float, float> angs, float S, uchar type, Tiles::Tile* tile, Vector pos, float a_see, float how_see);
+                Portal(Line line, uchar type, Tiles::Tile* tile, Vector pos, float a_see, float how_see);
 
                 ~Portal();
             };
