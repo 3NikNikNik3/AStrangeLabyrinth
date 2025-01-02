@@ -57,7 +57,7 @@ namespace AStrangeLabyrinth {
 
 		void draw_line(Ray::Room* root_room, Vector pos, float a, int x, sf::RenderWindow& window, std::pair<sf::Texture&, sf::Texture&> textures);
 
-        void draw_see(Tiles::Tile* tile, Vector pos, float a_see, float how_see, int n, sf::RenderWindow& window);
+        void draw_see(Tiles::Tile* tile, Vector pos, float a_see, float how_see, int n, int x, int y, sf::RenderWindow& window);
 
         void main_draw(Tiles::Tile* root, sf::RenderWindow& window);
 	}

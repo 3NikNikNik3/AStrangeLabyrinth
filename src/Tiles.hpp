@@ -13,7 +13,7 @@ namespace AStrangeLabyrinth {
 
             std::vector<std::pair<Math::Line, uchar>> boards;
 
-            Tile();
+            Tile(bool end=false);
 
             ~Tile();
 

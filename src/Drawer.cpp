@@ -1,6 +1,7 @@
 #include "Drawer.hpp"
 
 #include <algorithm>
+#include <iostream>
 
 namespace AStrangeLabyrinth {
 	namespace Drawer {
@@ -21,18 +22,26 @@ namespace AStrangeLabyrinth {
                 if (a1 > a2)
                     std::swap(a1, a2);
 
-                float b1 = (line.a - pos).ang();
-                float b2 = (line.b - pos).ang();
+                float b1 = mod_pi((line.a - pos).ang());
+                float b2 = mod_pi((line.b - pos).ang());
                 if (b1 > b2)
                     std::swap(b1, b2);
 
-                if (a2 - a1 > PI && b2 - b1 > PI)
+                if (a2 - a1 > PI && b2 - b1 > PI) {
                     return check_aline_on_aline(a2, a1 + 2 * PI, b2, b1 + 2 * PI);
+                }
                 else if (a2 - a1 > PI)
                     return check_aline_on_aline(a2, PI, b1, b2) || check_aline_on_aline(-PI, a1, b1, b2);
                 else if (b2 - b1 > PI)
                     return check_aline_on_aline(a1, a2, b2, PI) || check_aline_on_aline(a1, a2, -PI, b1);
                 return check_aline_on_aline(a1, a2, b1, b2);
+            }
+
+            bool check_see_on_line(float a, std::pair<float, float> ages) {
+                if (ages.second - ages.first > PI) {
+                    return ages.second <= a || a <= ages.first;
+                }
+                return ages.first <= a && a <= ages.second;
             }
 
             bool check_aline_on_aline(float a1, float a2, float b1, float b2) {
@@ -61,11 +70,27 @@ namespace AStrangeLabyrinth {
                 }
             }
 
+            Vector get_pos(Vector old_pos, uchar type_portal) {
+                if (type_portal == 0)
+                    old_pos.y += 2;
+                else if (type_portal == 1)
+                    old_pos.x -= 2;
+                else if (type_portal == 2)
+                    old_pos.y -= 2;
+                else
+                    old_pos.x += 2;
+
+                return old_pos;
+            }
+
             std::vector<Board*> Room::get_boards() {
                 if (boards.size() == 0) {
                     for (int i = 0; i < tile->boards.size(); ++i)
                         if (check_line_on_see(tile->boards[i].first, pos, a_see, how_see)) {
-                            boards.push_back(new Board(tile->boards[i].first, pos, tile->boards[i].second));
+                            if (tile->boards[i].second > 3)
+                                boards.push_back(new Board(tile->boards[i].first, pos, tile->boards[i].second));
+                            else
+                                boards.push_back(new Portal(tile->boards[i].first, tile->boards[i].second, tile->go[tile->boards[i].second], pos, a_see, how_see));
                         }
                 }
                 return boards;
@@ -73,7 +98,7 @@ namespace AStrangeLabyrinth {
 
             // Portal
             Portal::Portal(Line line, uchar type, Tiles::Tile* tile, Vector pos, float a_see, float how_see) : Board(line, pos, type) {
-                room = new Room(tile, pos, a_see, how_see);
+                room = new Room(tile, get_pos(pos, type), a_see, how_see);
             }
 
             Portal::~Portal() {
@@ -86,17 +111,21 @@ namespace AStrangeLabyrinth {
 
             int from_ = -1;
             Ray::Board *ans = nullptr;
+            float ans_S = -1;
+
+            Vector norm_v = Vector(cos(a), sin(a));
 
             while (ans == nullptr || ans->type < 4) {
                 std::vector<Ray::Board*> arr = root_room->get_boards();
-                Ray::Board *local_ans = arr[0];
-                float loc_S = 0;
+                Ray::Board *local_ans = nullptr;
+                float loc_S = 50;
 
-                Vector norm_v = Vector(cos(a), sin(a));
-
-                for (int i = 1; i < arr.size(); ++i) {
-                    if (ans == nullptr || arr[i]->type != (ans->type + 2) % 4) { // "delete" portal to previous room
+                for (int i = 0; i < arr.size(); ++i) {
+                    if ((ans == nullptr || arr[i]->type != (ans->type + 2) % 4) && Ray::check_see_on_line(a, arr[i]->angs)) { // "delete" portal to previous room
                         float now_S = arr[i]->S / ((norm_v * arr[i]->perp) / (arr[i]->perp.len() * norm_v.len()));
+                        if (now_S < 0) {
+                            now_S *= -1;
+                        }
 
                         if (now_S < loc_S) {
                             loc_S = now_S;
@@ -106,6 +135,7 @@ namespace AStrangeLabyrinth {
                 }
 
                 ans = local_ans;
+                ans_S = loc_S;
                 if (local_ans == nullptr) {
                     break;
                 } else if (ans->type < 4) {
@@ -121,44 +151,57 @@ namespace AStrangeLabyrinth {
                 else
                     tx_now = textures.second;
 
+                float size_see = 0.5 / ans_S;
+
                 sf::Sprite spr(tx_now);
-                spr.setPosition({x, 0.0f});
-                spr.setScale({1.0f, 0.5f});
+                spr.setPosition({x, window.getSize().y / 2 * (1 - size_see)});
+                spr.setScale({1.0f, size_see});
 
                 window.draw(spr);
             }
 		}
 
-		void draw_see(Tiles::Tile* tile, Vector pos, float a_see, float how_see, int n, sf::RenderWindow& window) {
+		void draw_see(Tiles::Tile* tile, Vector pos, float a_see, float how_see, int n, int x, int y, sf::RenderWindow& window) {
             Ray::Room root_room = Ray::Room(tile, pos, a_see, how_see);
 
-            auto [w, h] = window.getSize();
-            sf::Texture texture(sf::Vector2u(w, h));
+            x /= n;
+            sf::Texture texture(sf::Vector2u(x, y));
 
-            std::vector<std::uint8_t> pix(w * h * 4);
-            for (int i = 0; i < w * h; ++i) {
+            std::vector<std::uint8_t> pix(x * y * 4);
+            for (int i = 0; i < x * y; ++i) {
                 pix[i * 4] = pix[i * 4 + 1] = pix[i * 4 + 2] = 128;
                 pix[i * 4 + 3] = 255;
             }
             texture.update(pix.data());
 
             for (int i = 0; i < n; ++i) {
-                draw_line(&root_room, pos, a_see - how_see + how_see / n * i, i, window, {texture, texture});
+                draw_line(&root_room, pos, a_see - how_see / 2 + how_see / n * i, i * x, window, {texture, texture});
             }
 		}
 
 		void main_draw(Tiles::Tile* tile, sf::RenderWindow& window) {
+            float a = 0;
 
+            const int h_x = 5, scale_x = 2;
+
+            sf::View view(sf::FloatRect({0.f, 0.f}, {1.f, 1.f}));
+            window.setView(view);
 
             while (window.isOpen()) {
                 while (const std::optional event = window.pollEvent()) {
                     if (event->is<sf::Event::Closed>())
                         window.close();
+                    else if (const auto* resized = event->getIf<sf::Event::Resized>())
+                        window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {resized->size.x / scale_x, resized->size.y})));
                 }
 
+                a = Ray::mod_pi(a + 0.05);
+
+                auto [w, h] = window.getSize();
                 window.clear(sf::Color::White);
 
-                draw_see(tile, {1.5f, 1.5f}, -Math::PI / 2, Math::PI / 2, 2000, window);
+
+                draw_see(tile, {1.5f, 1.5f}, a, Math::PI / 2, w / scale_x / h_x, w / scale_x, h, window);
 
                 window.display();
             }

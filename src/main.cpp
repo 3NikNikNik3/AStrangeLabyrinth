@@ -10,9 +10,9 @@ int main() {
     q.update_boards();
     w.update_boards();
 
-    sf::RenderWindow window(sf::VideoMode({800, 600}), "A strange labyrinth", sf::Style::Resize | sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode({800, 600}), "A strange labyrinth", sf::Style::Default);
 
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(30);
 
     Drawer::main_draw(&q, window);
 

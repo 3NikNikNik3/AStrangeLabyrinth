@@ -4,7 +4,7 @@ using namespace AStrangeLabyrinth::Math;
 
 namespace AStrangeLabyrinth {
 	namespace Tiles {
-		Tile::Tile() {
+		Tile::Tile(bool end) : end(end) {
             go = new Tile*[4];
         }
 
