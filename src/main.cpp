@@ -7,6 +7,8 @@ int main() {
     Tiles::Tile q, w;
     w.go[0] = &q;
     q.go[2] = &w;
+    w.go[1] = &w;
+    w.go[3] = &w;
     q.update_boards();
     w.update_boards();
 

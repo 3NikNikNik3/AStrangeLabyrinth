@@ -72,13 +72,13 @@ namespace AStrangeLabyrinth {
 
             Vector get_pos(Vector old_pos, uchar type_portal) {
                 if (type_portal == 0)
-                    old_pos.y += 2;
+                    old_pos.y += 3;
                 else if (type_portal == 1)
-                    old_pos.x -= 2;
+                    old_pos.x -= 3;
                 else if (type_portal == 2)
-                    old_pos.y -= 2;
+                    old_pos.y -= 3;
                 else
-                    old_pos.x += 2;
+                    old_pos.x += 3;
 
                 return old_pos;
             }
@@ -175,17 +175,74 @@ namespace AStrangeLabyrinth {
             texture.update(pix.data());
 
             for (int i = 0; i < n; ++i) {
-                draw_line(&root_room, pos, a_see - how_see / 2 + how_see / n * i, i * x, window, {texture, texture});
+                draw_line(&root_room, pos, Ray::mod_pi(a_see - how_see / 2 + how_see / n * i), i * x, window, {texture, texture});
+            }
+		}
+
+		bool ok(Vector pos, Tiles::Tile* tile) {
+            float A, B, C, S;
+            Vector perp(0, 0), line(0, 0);
+
+            for (int i = 0; i < tile->boards.size(); ++i)
+                if (tile->boards[i].second > 3) {
+                    line = tile->boards[i].first.b - tile->boards[i].first.a;
+                    //perp = (tile->boards[i].first.b - tile->boards[i].first.a).rot90();
+                    //if ((perp * (pos - tile->boards[i].first.a) < 0) != (perp * (pos - tile->boards[i].first.b) < 0)) {
+                    if (((tile->boards[i].first.a - pos) * (tile->boards[i].first.b - tile->boards[i].first.a) > 0) != ((tile->boards[i].first.b - pos) * (tile->boards[i].first.b - tile->boards[i].first.a) > 0)) {
+                        A = tile->boards[i].first.b.y - tile->boards[i].first.a.y;
+                        B = tile->boards[i].first.a.x - tile->boards[i].first.b.x;
+                        C = tile->boards[i].first.b.x * tile->boards[i].first.a.y - tile->boards[i].first.a.x * tile->boards[i].first.b.y;
+
+                        S = (A * pos.x + B * pos.y + C) / sqrt(A * A + B * B);
+                        if (S < 0)
+                            S *= -1;
+                    } else
+                        S = std::min((pos - tile->boards[i].first.a).len(), (pos - tile->boards[i].first.b).len());
+
+                    if (S < R_PLAYER) {
+                        return false;
+                    }
+                }
+            return true;
+		}
+
+		void move_player(Vector &pos, Tiles::Tile*& tile, Vector shift) {
+            if (ok(pos + shift, tile))
+                pos += shift;
+            else if (ok(pos + Vector(shift.x, 0), tile))
+                pos.x += shift.x;
+            else if (ok(pos + Vector(0, shift.y), tile))
+                pos.y += shift.y;
+
+            if (pos.x < 0 && tile->go[3] != nullptr) {
+                tile = tile->go[3];
+                pos = Ray::get_pos(pos, 3);
+            }
+            else if (pos.x > 3 && tile->go[1] != nullptr) {
+                tile = tile->go[1];
+                pos = Ray::get_pos(pos, 1);
+            }
+            else if (pos.y < 0 && tile->go[0] != nullptr) {
+                tile = tile->go[0];
+                pos = Ray::get_pos(pos, 0);
+            }
+            else if (pos.y > 3 && tile->go[2] != nullptr) {
+                tile = tile->go[2];
+                pos = Ray::get_pos(pos, 2);
             }
 		}
 
 		void main_draw(Tiles::Tile* tile, sf::RenderWindow& window) {
             float a = 0;
 
-            const int h_x = 5, scale_x = 2;
+            const int h_x = 2, scale_x = 2;
 
             sf::View view(sf::FloatRect({0.f, 0.f}, {1.f, 1.f}));
             window.setView(view);
+
+            Vector pos = {1.5f, 1.5f};
+
+            sf::Clock clock;
 
             while (window.isOpen()) {
                 while (const std::optional event = window.pollEvent()) {
@@ -195,13 +252,32 @@ namespace AStrangeLabyrinth {
                         window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {resized->size.x / scale_x, resized->size.y})));
                 }
 
-                a = Ray::mod_pi(a + 0.05);
+                float delta =  clock.restart().asSeconds();
+
+                //a = Ray::mod_pi(a + 0.05);
+
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::E))
+                    a = Ray::mod_pi(a + 2 * delta);
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q))
+                    a = Ray::mod_pi(a - 2 * delta);
+
+                Vector shift(0, 0);
+
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+                    shift.x += 1;
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+                    shift.y += 1;
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+                    shift.x -= 1;
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+                    shift.y -= 1;
+
+                move_player(pos, tile, shift.rot(a).norm() * SPEED * delta);
 
                 auto [w, h] = window.getSize();
                 window.clear(sf::Color::White);
 
-
-                draw_see(tile, {1.5f, 1.5f}, a, Math::PI / 2, w / scale_x / h_x, w / scale_x, h, window);
+                draw_see(tile, pos, a, Math::PI / 2, w / scale_x / h_x, w / scale_x, h, window);
 
                 window.display();
             }

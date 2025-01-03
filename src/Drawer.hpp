@@ -59,6 +59,14 @@ namespace AStrangeLabyrinth {
 
         void draw_see(Tiles::Tile* tile, Vector pos, float a_see, float how_see, int n, int x, int y, sf::RenderWindow& window);
 
+        void move_player(Vector &pos, Tiles::Tile*& tile, Vector shift);
+
+        const float R_PLAYER = 0.05;
+
+        bool ok(Vector pos, Tiles::Tile* tile);
+
+        const float SPEED = 1;
+
         void main_draw(Tiles::Tile* root, sf::RenderWindow& window);
 	}
 }
