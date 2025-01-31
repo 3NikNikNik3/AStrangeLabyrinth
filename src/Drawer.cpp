@@ -242,6 +242,8 @@ namespace AStrangeLabyrinth {
 
             Vector pos = {1.5f, 1.5f};
 
+            float add_speed = 1;
+
             sf::Clock clock;
 
             while (window.isOpen()) {
@@ -250,6 +252,13 @@ namespace AStrangeLabyrinth {
                         window.close();
                     else if (const auto* resized = event->getIf<sf::Event::Resized>())
                         window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {resized->size.x / scale_x, resized->size.y})));
+                    else if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
+                        if (key->scancode == sf::Keyboard::Scancode::LShift)
+                            add_speed = 1.5;
+                    } else if (const auto* key = event->getIf<sf::Event::KeyReleased>()) {
+                        if (key->scancode == sf::Keyboard::Scancode::LShift)
+                            add_speed = 1;
+                    }
                 }
 
                 float delta =  clock.restart().asSeconds();
@@ -272,7 +281,7 @@ namespace AStrangeLabyrinth {
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
                     shift.y -= 1;
 
-                move_player(pos, tile, shift.rot(a).norm() * SPEED * delta);
+                move_player(pos, tile, shift.rot(a).norm() * SPEED * add_speed * delta);
 
                 auto [w, h] = window.getSize();
                 window.clear(sf::Color::White);
