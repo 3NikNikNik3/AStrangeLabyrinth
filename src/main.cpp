@@ -27,7 +27,7 @@ int main() {
     r->update_boards();
     a->update_boards();*/
 
-    Tiles::Tile *room = Tiles::Generater::generate_rooms(Tiles::Generater::Settings());
+    Tiles::Tile *room = Tiles::Generater::generate(Tiles::Generater::Settings());
 
     sf::RenderWindow window(sf::VideoMode({800, 600}), "A strange labyrinth", sf::Style::Default);
 

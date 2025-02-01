@@ -30,9 +30,13 @@ namespace AStrangeLabyrinth {
                 Settings() = default;
 
                 Settings(uchar depth_forks[3], uchar count_start_forks);
+
+                Settings(uchar start_depth, uchar midle_depth, uchar end_depth, uchar count_start_forks);
             };
 
             Tile* generate_rooms(Settings settings, Tile *p = nullptr, uchar from_ = -1, uchar S = 0);
+
+            Tile* generate(Settings settings);
 		}
 	}
 }

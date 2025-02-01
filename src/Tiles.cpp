@@ -78,6 +78,11 @@ namespace AStrangeLabyrinth {
             // Settings
             Settings::Settings(uchar depth_forks[3], uchar count_start_forks) : depth_forks({depth_forks[0], depth_forks[1], depth_forks[2]}), count_start_forks(count_start_forks) {}
 
+            Settings::Settings(uchar start_depth, uchar midle_depth, uchar end_depth, uchar count_start_forks) : depth_forks({start_depth, midle_depth, end_depth}), count_start_forks(count_start_forks) {}
+
+            // Generate
+            std::vector<Tile*> ends;
+
             Tile* generate_rooms(Settings settings, Tile *p, uchar from_, uchar S) {
                 Tile* res = new Tile();
 
@@ -113,10 +118,14 @@ namespace AStrangeLabyrinth {
                     } else if (settings.depth_forks[0] + settings.depth_forks[1] + settings.depth_forks[2] >= S) {
                         if (rand() % 2 == 0)
                             add = 1;
-                        else
+                        else {
                             add = 0;
-                    } else
+                            ends.push_back(res);
+                        }
+                    } else {
                         add = 0;
+                        ends.push_back(res);
+                    }
 
                     // generate
                     /*for (int i = 0; i < 4; ++i) {
@@ -145,6 +154,22 @@ namespace AStrangeLabyrinth {
 
                 res->update_boards();
                 return res;
+            }
+
+            Tile* generate(Settings settings) {
+                Tile* ans = generate_rooms(settings);
+
+                // chose end room
+                int who = rand() % ends.size();
+
+                ends[who]->end = true;
+                ends[who]->update_boards();
+
+                ends.clear();
+
+                std::cout << who << std::endl;
+
+                return ans;
             }
         }
 	}
