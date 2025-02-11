@@ -106,7 +106,7 @@ namespace AStrangeLabyrinth {
             }
 		}
 
-		void draw_line(Ray::Room* root_room, Vector pos, float a, int x, sf::RenderWindow& window, std::pair<sf::Texture&, sf::Texture&> textures) {
+		void draw_line(Ray::Room* root_room, Vector pos, float a, int x, sf::RenderWindow& window, std::pair<sf::Color, sf::Color> textures) {
             // What draw
 
             int from_ = -1;
@@ -145,19 +145,19 @@ namespace AStrangeLabyrinth {
 
             // Draw
             if (ans != nullptr) {
-                sf::Texture tx_now;
+                sf::Color col_now;
                 if (ans->type == 4)
-                    tx_now = textures.first;
+                    col_now = textures.first;
                 else
-                    tx_now = textures.second;
+                    col_now = textures.second;
 
                 float size_see = 0.5 / ans_S;
 
-                sf::Sprite spr(tx_now);
-                spr.setPosition({x, window.getSize().y / 2 * (1 - size_see)});
-                spr.setScale({1.0f, size_see});
+                sf::RectangleShape rect({6, window.getSize().y * size_see});
+                rect.setFillColor(col_now);
+                rect.setPosition({x, window.getSize().y / 2 * (1 - size_see)});
 
-                window.draw(spr);
+                window.draw(rect);
             }
 		}
 
@@ -165,17 +165,9 @@ namespace AStrangeLabyrinth {
             Ray::Room root_room = Ray::Room(tile, pos, a_see, how_see);
 
             x /= n;
-            sf::Texture texture(sf::Vector2u(x, y));
-
-            std::vector<std::uint8_t> pix(x * y * 4);
-            for (int i = 0; i < x * y; ++i) {
-                pix[i * 4] = pix[i * 4 + 1] = pix[i * 4 + 2] = 128;
-                pix[i * 4 + 3] = 255;
-            }
-            texture.update(pix.data());
 
             for (int i = 0; i < n; ++i) {
-                draw_line(&root_room, pos, Ray::mod_pi(a_see - how_see / 2 + how_see / n * i), i * x, window, {texture, texture});
+                draw_line(&root_room, pos, Ray::mod_pi(a_see - how_see / 2 + how_see / n * i), i * x, window, {sf::Color(128, 128, 128), sf::Color(128, 0, 128)});
             }
 		}
 
