@@ -64,9 +64,5 @@ namespace AStrangeLabyrinth {
         const float R_PLAYER = 0.05;
 
         bool ok(Vector pos, Tiles::Tile* tile);
-
-        const float SPEED = 1;
-
-        void main_draw(Tiles::Tile* root, sf::RenderWindow& window);
 	}
 }

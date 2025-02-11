@@ -1,7 +1,5 @@
 #include "Tiles.hpp"
 
-#include <iostream>
-
 using namespace AStrangeLabyrinth::Math;
 
 namespace AStrangeLabyrinth {
@@ -166,8 +164,6 @@ namespace AStrangeLabyrinth {
                 ends[who]->update_boards();
 
                 ends.clear();
-
-                std::cout << who << std::endl;
 
                 return ans;
             }

@@ -2,6 +2,7 @@
 #include "Drawer.hpp"
 
 using namespace AStrangeLabyrinth;
+using namespace Screens;
 
 int main() {
     /*Tiles::Tile *q = new Tiles::Tile(), *w = new Tiles::Tile(), *e = new Tiles::Tile(), *r = new Tiles::Tile();
@@ -33,7 +34,9 @@ int main() {
 
     window.setFramerateLimit(30);
 
-    Drawer::main_draw(room, window);
+    ScreenDraw screen_main;
+
+    screen_main.go(room, window);
 
     delete room;
 
