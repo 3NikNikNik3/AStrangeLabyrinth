@@ -59,7 +59,7 @@ namespace AStrangeLabyrinth {
                 auto [w, h] = window.getSize();
                 window.clear(sf::Color::White);
 
-                Drawer::draw_see(tile, pos, a, Math::PI / 2, w / scale_x / h_x, w / scale_x, h, window);
+                Drawer::draw_see(tile, pos, a, Math::PI / 2, w / scale_x / h_x, w / scale_x, h, h_x, window);
 
                 window.display();
             }

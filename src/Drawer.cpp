@@ -106,7 +106,7 @@ namespace AStrangeLabyrinth {
             }
 		}
 
-		void draw_line(Ray::Room* root_room, Vector pos, float a, int x, sf::RenderWindow& window, std::pair<sf::Color, sf::Color> textures) {
+		void draw_line(Ray::Room* root_room, Vector pos, float a, int x, sf::RenderWindow& window, std::pair<sf::Color, sf::Color> textures, int h_x) {
             // What draw
 
             int from_ = -1;
@@ -153,7 +153,7 @@ namespace AStrangeLabyrinth {
 
                 float size_see = 0.5 / ans_S;
 
-                sf::RectangleShape rect({6, window.getSize().y * size_see});
+                sf::RectangleShape rect({h_x, window.getSize().y * size_see});
                 rect.setFillColor(col_now);
                 rect.setPosition({x, window.getSize().y / 2 * (1 - size_see)});
 
@@ -161,13 +161,13 @@ namespace AStrangeLabyrinth {
             }
 		}
 
-		void draw_see(Tiles::Tile* tile, Vector pos, float a_see, float how_see, int n, int x, int y, sf::RenderWindow& window) {
+		void draw_see(Tiles::Tile* tile, Vector pos, float a_see, float how_see, int n, int x, int y, int h_x, sf::RenderWindow& window) {
             Ray::Room root_room = Ray::Room(tile, pos, a_see, how_see);
 
             x /= n;
 
             for (int i = 0; i < n; ++i) {
-                draw_line(&root_room, pos, Ray::mod_pi(a_see - how_see / 2 + how_see / n * i), i * x, window, {sf::Color(128, 128, 128), sf::Color(128, 0, 128)});
+                draw_line(&root_room, pos, Ray::mod_pi(a_see - how_see / 2 + how_see / n * i), i * x, window, {sf::Color(128, 128, 128), sf::Color(128, 0, 128)}, h_x);
             }
 		}
 
