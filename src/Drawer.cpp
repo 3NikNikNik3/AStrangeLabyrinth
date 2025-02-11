@@ -106,9 +106,12 @@ namespace AStrangeLabyrinth {
             }
 		}
 
-		void draw_line(Ray::Room* root_room, Vector pos, float a, int x, sf::RenderWindow& window, std::pair<sf::Color, sf::Color> textures, int h_x) {
-            // What draw
+		void calculate_lines(std::vector<std::pair<float, char>> &Ss_ans, Ray::Room* root_room, Vector pos, float a, float how_see, int n) {
+            for (int i = 0; i < Ss_ans.size(); ++i)
+                Ss_ans[i] = calculate_line(root_room, pos, Ray::mod_pi(a - how_see / 2 + how_see / n * i));
+		}
 
+		std::pair<float, char> calculate_line(Ray::Room* root_room, Vector pos, float a) {
             int from_ = -1;
             Ray::Board *ans = nullptr;
             float ans_S = -1;
@@ -143,15 +146,20 @@ namespace AStrangeLabyrinth {
                 }
             }
 
-            // Draw
-            if (ans != nullptr) {
+            if (ans != nullptr)
+                return {ans_S, ans->type};
+            return {10, -1};
+		}
+
+		void draw_line(std::pair<float, char> data, int x, sf::RenderWindow& window, std::pair<sf::Color, sf::Color> textures, int h_x) {
+            if (data.second != -1) {
                 sf::Color col_now;
-                if (ans->type == 4)
+                if (data.second == 4)
                     col_now = textures.first;
                 else
                     col_now = textures.second;
 
-                float size_see = 0.5 / ans_S;
+                float size_see = 0.5 / data.first;
 
                 sf::RectangleShape rect({h_x, window.getSize().y * size_see});
                 rect.setFillColor(col_now);
@@ -166,8 +174,11 @@ namespace AStrangeLabyrinth {
 
             x /= n;
 
+            std::vector<std::pair<float, char>> Ss(n);
+            calculate_lines(Ss, &root_room, pos, a_see, how_see, n);
+
             for (int i = 0; i < n; ++i) {
-                draw_line(&root_room, pos, Ray::mod_pi(a_see - how_see / 2 + how_see / n * i), i * x, window, {sf::Color(128, 128, 128), sf::Color(128, 0, 128)}, h_x);
+                draw_line(Ss[i], x * i, window, {sf::Color(128, 128, 128), sf::Color(0, 128, 128)}, h_x);
             }
 		}
 

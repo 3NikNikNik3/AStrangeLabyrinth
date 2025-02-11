@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "Tiles.hpp"
 
 #include <SFML/Window.hpp>
@@ -55,7 +57,11 @@ namespace AStrangeLabyrinth {
             };
 		}
 
-		void draw_line(Ray::Room* root_room, Vector pos, float a, int x, sf::RenderWindow& window, std::pair<sf::Color, sf::Color> textures, int h_x);
+		void draw_line(float S, int x, sf::RenderWindow& window, std::pair<sf::Color, sf::Color> textures, int h_x);
+
+		void calculate_lines(std::vector<std::pair<float, char>> &Ss_ans, Ray::Room* root_room, Vector pos, float a, float how_see, int n);
+
+		std::pair<float, char> calculate_line(Ray::Room* root_room, Vector pos, float a);
 
         void draw_see(Tiles::Tile* tile, Vector pos, float a_see, float how_see, int n, int x, int y, int h_x, sf::RenderWindow& window);
 
