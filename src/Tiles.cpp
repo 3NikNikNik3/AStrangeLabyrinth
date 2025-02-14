@@ -34,7 +34,7 @@ namespace AStrangeLabyrinth {
                     boards.push_back({Line({2, 1}, {2, 3}), 4});
                 } else {
                     boards.push_back({Line({0, 1}, {2, 1}), 4});
-                    boards.push_back({Line({0, 1}, {2, 2}), 5});
+                    boards.push_back({Line({2, 1}, {2, 2}), 5});
                     boards.push_back({Line({2, 2}, {0, 2}), 4});
                 }
             } else {
