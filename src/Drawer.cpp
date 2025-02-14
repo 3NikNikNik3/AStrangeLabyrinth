@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <thread>
 
 namespace AStrangeLabyrinth {
 	namespace Drawer {
@@ -62,7 +63,22 @@ namespace AStrangeLabyrinth {
             }
 
             // Room
-            Room::Room(Tiles::Tile* tile, Vector pos, float a_see, float how_see) : tile(tile), pos(pos), a_see(a_see), how_see(how_see) {}
+            Room::Room(Tiles::Tile* tile, Vector pos, float a_see, float how_see, Room *from) : tile(tile), pos(pos), a_see(a_see), how_see(how_see) {
+                for (int i = 0; i < tile->boards.size(); ++i)
+                        if (check_line_on_see(tile->boards[i].first, pos, a_see, how_see)) {
+                            if (tile->boards[i].second > 3)
+                                boards.push_back(new Board(tile->boards[i].first, pos, tile->boards[i].second));
+                            else {
+                                if (from != nullptr)
+                                    if (from->tile == tile->go[tile->boards[i].second])
+                                        boards.push_back(new Portal(tile->boards[i].first, tile->boards[i].second, from, pos));
+                                    else
+                                        boards.push_back(new Portal(tile->boards[i].first, tile->boards[i].second, tile->go[tile->boards[i].second], pos, a_see, how_see, this));
+                                else
+                                    boards.push_back(new Portal(tile->boards[i].first, tile->boards[i].second, tile->go[tile->boards[i].second], pos, a_see, how_see, this));
+                            }
+                        }
+            }
 
             Room::~Room() {
                 for (int i = 0; i < boards.size(); ++i) {
@@ -84,30 +100,23 @@ namespace AStrangeLabyrinth {
             }
 
             std::vector<Board*> Room::get_boards() {
-                if (boards.size() == 0) {
-                    for (int i = 0; i < tile->boards.size(); ++i)
-                        if (check_line_on_see(tile->boards[i].first, pos, a_see, how_see)) {
-                            if (tile->boards[i].second > 3)
-                                boards.push_back(new Board(tile->boards[i].first, pos, tile->boards[i].second));
-                            else
-                                boards.push_back(new Portal(tile->boards[i].first, tile->boards[i].second, tile->go[tile->boards[i].second], pos, a_see, how_see));
-                        }
-                }
                 return boards;
             }
 
             // Portal
-            Portal::Portal(Line line, uchar type, Tiles::Tile* tile, Vector pos, float a_see, float how_see) : Board(line, pos, type) {
-                room = new Room(tile, get_pos(pos, type), a_see, how_see);
+            Portal::Portal(Line line, uchar type, Tiles::Tile* tile, Vector pos, float a_see, float how_see, Room *from) : Board(line, pos, type) {
+                room = new Room(tile, get_pos(pos, type), a_see, how_see, from);
             }
+
+            Portal::Portal(Line line, uchar type, Room *room, Vector pos) : Board(line, pos, type), room(room) {}
 
             Portal::~Portal() {
                 delete room;
             }
 		}
 
-		void calculate_lines(std::vector<std::pair<float, char>> &Ss_ans, Ray::Room* root_room, Vector pos, float a, float how_see, int n) {
-            for (int i = 0; i < Ss_ans.size(); ++i)
+		void calculate_lines(std::pair<float, char> *Ss_ans, int s, int e, Ray::Room* root_room, Vector pos, float a, float how_see, int n) {
+            for (int i = s; i < e; ++i)
                 Ss_ans[i] = calculate_line(root_room, pos, Ray::mod_pi(a - how_see / 2 + how_see / n * i));
 		}
 
@@ -170,16 +179,31 @@ namespace AStrangeLabyrinth {
 		}
 
 		void draw_see(Tiles::Tile* tile, Vector pos, float a_see, float how_see, int n, int x, int y, int h_x, sf::RenderWindow& window) {
-            Ray::Room root_room = Ray::Room(tile, pos, a_see, how_see);
+            Ray::Room root_room = Ray::Room(tile, pos, a_see, how_see, nullptr);
 
             x /= n;
 
-            std::vector<std::pair<float, char>> Ss(n);
-            calculate_lines(Ss, &root_room, pos, a_see, how_see, n);
+            std::pair<float, char> *Ss = new std::pair<float, char>[n];
+
+            unsigned int count_th = std::max(std::thread::hardware_concurrency() - 1, (unsigned int)0);
+            unsigned int go = n / (count_th + 1);
+            std::thread* threads[count_th];
+
+            for (int i = 0; i < count_th; ++i)
+                threads[i] = new std::thread(calculate_lines, Ss, i * go, (i + 1) * go, &root_room, pos, a_see, how_see, n);
+
+            calculate_lines(Ss, count_th * go, n, &root_room, pos, a_see, how_see, n);
+
+            for (int i = 0; i < count_th; ++i) {
+                threads[i]->join();
+                delete threads[i];
+            }
 
             for (int i = 0; i < n; ++i) {
                 draw_line(Ss[i], x * i, window, {sf::Color(128, 128, 128), sf::Color(0, 128, 128)}, h_x);
             }
+
+            delete[] Ss;
 		}
 
 		bool ok(Vector pos, Tiles::Tile* tile) {

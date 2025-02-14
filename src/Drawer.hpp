@@ -39,7 +39,7 @@ namespace AStrangeLabyrinth {
 
                 public:
 
-                Room(Tiles::Tile* tile, Vector pos, float a_see, float how_see);
+                Room(Tiles::Tile* tile, Vector pos, float a_see, float how_see, Room* from);
 
                 ~Room();
 
@@ -51,7 +51,9 @@ namespace AStrangeLabyrinth {
 
                 Room* room;
 
-                Portal(Line line, uchar type, Tiles::Tile* tile, Vector pos, float a_see, float how_see);
+                Portal(Line line, uchar type, Tiles::Tile* tile, Vector pos, float a_see, float how_see, Room *from);
+
+                Portal(Line line, uchar type, Room *room, Vector pos);
 
                 ~Portal();
             };
@@ -59,7 +61,7 @@ namespace AStrangeLabyrinth {
 
 		void draw_line(float S, int x, sf::RenderWindow& window, std::pair<sf::Color, sf::Color> textures, int h_x);
 
-		void calculate_lines(std::vector<std::pair<float, char>> &Ss_ans, Ray::Room* root_room, Vector pos, float a, float how_see, int n);
+		void calculate_lines(std::pair<float, char> *Ss_ans, int s, int e, Ray::Room* root_room, Vector pos, float a, float how_see, int n);
 
 		std::pair<float, char> calculate_line(Ray::Room* root_room, Vector pos, float a);
 

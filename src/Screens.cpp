@@ -8,7 +8,7 @@ namespace AStrangeLabyrinth {
 		void ScreenDraw::go(Tiles::Tile* tile, sf::RenderWindow& window) {
             float a = 0;
 
-            const int h_x = 2, scale_x = 2;
+            const int h_x = 1, scale_x = 1;
 
             sf::View view(sf::FloatRect({0.f, 0.f}, {1.f, 1.f}));
             window.setView(view);
