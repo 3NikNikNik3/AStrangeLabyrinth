@@ -10,7 +10,7 @@ namespace AStrangeLabyrinth {
 
             const int h_x = 1, scale_x = 1;
 
-            sf::View view(sf::FloatRect({0.f, 0.f}, {1.f, 1.f}));
+            sf::View view(sf::FloatRect({0.f, 0.f}, {800.f, 600.f}));
             window.setView(view);
 
             Vector pos = {1.5f, 1.5f};
