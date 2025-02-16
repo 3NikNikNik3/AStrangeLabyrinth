@@ -39,7 +39,7 @@ namespace AStrangeLabyrinth {
 
                 public:
 
-                Room(Tiles::Tile* tile, Vector pos, float a_see, float how_see, Room* from);
+                Room(Tiles::Tile* tile, Vector pos, float a_see, float how_see, uchar from, uchar S=0);
 
                 ~Room();
 
@@ -51,7 +51,7 @@ namespace AStrangeLabyrinth {
 
                 Room* room;
 
-                Portal(Line line, uchar type, Tiles::Tile* tile, Vector pos, float a_see, float how_see, Room *from);
+                Portal(Line line, uchar type, Tiles::Tile* tile, Vector pos, float a_see, float how_see, uchar from, uchar S);
 
                 Portal(Line line, uchar type, Room *room, Vector pos);
 

@@ -28,6 +28,13 @@ int main() {
     r->update_boards();
     a->update_boards();*/
 
+    /*Tiles::Tile *room = new Tiles::Tile();
+
+    room->go[0] = room;
+    room->go[2] = room;
+
+    room->update_boards();*/
+
     Tiles::Tile *room = Tiles::Generater::generate(Tiles::Generater::Settings(1, 1, 1, 3));
 
     sf::RenderWindow window(sf::VideoMode({800, 600}), "A strange labyrinth", sf::Style::Default);

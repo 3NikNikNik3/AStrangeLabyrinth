@@ -63,21 +63,19 @@ namespace AStrangeLabyrinth {
             }
 
             // Room
-            Room::Room(Tiles::Tile* tile, Vector pos, float a_see, float how_see, Room *from) : tile(tile), pos(pos), a_see(a_see), how_see(how_see) {
-                for (int i = 0; i < tile->boards.size(); ++i)
-                        if (check_line_on_see(tile->boards[i].first, pos, a_see, how_see)) {
-                            if (tile->boards[i].second > 3)
-                                boards.push_back(new Board(tile->boards[i].first, pos, tile->boards[i].second));
-                            else {
-                                if (from != nullptr)
-                                    if (from->tile == tile->go[tile->boards[i].second])
-                                        boards.push_back(new Portal(tile->boards[i].first, tile->boards[i].second, from, pos));
-                                    else
-                                        boards.push_back(new Portal(tile->boards[i].first, tile->boards[i].second, tile->go[tile->boards[i].second], pos, a_see, how_see, this));
-                                else
-                                    boards.push_back(new Portal(tile->boards[i].first, tile->boards[i].second, tile->go[tile->boards[i].second], pos, a_see, how_see, this));
-                            }
+            Room::Room(Tiles::Tile* tile, Vector pos, float a_see, float how_see, uchar from, uchar S) : tile(tile), pos(pos), a_see(a_see), how_see(how_see) {
+                for (int i = 0; i < tile->boards.size(); ++i) {
+                    if (check_line_on_see(tile->boards[i].first, pos, a_see, how_see)) {
+                        if (tile->boards[i].second > 3 )
+                            boards.push_back(new Board(tile->boards[i].first, pos, tile->boards[i].second));
+                        else {
+                            if (tile->boards[i].second == from || S >= 20) ;
+                                //boards.push_back(new Portal(tile->boards[i].first, tile->boards[i].second, nullptr, pos));
+                            else
+                                boards.push_back(new Portal(tile->boards[i].first, tile->boards[i].second, tile->go[tile->boards[i].second], pos, a_see, how_see, tile->boards[i].second, S + 1));
                         }
+                    }
+                }
             }
 
             Room::~Room() {
@@ -104,8 +102,8 @@ namespace AStrangeLabyrinth {
             }
 
             // Portal
-            Portal::Portal(Line line, uchar type, Tiles::Tile* tile, Vector pos, float a_see, float how_see, Room *from) : Board(line, pos, type) {
-                room = new Room(tile, get_pos(pos, type), a_see, how_see, from);
+            Portal::Portal(Line line, uchar type, Tiles::Tile* tile, Vector pos, float a_see, float how_see, uchar from, uchar S) : Board(line, pos, type) {
+                room = new Room(tile, get_pos(pos, type), a_see, how_see, (2 + from) % 4, S);
             }
 
             Portal::Portal(Line line, uchar type, Room *room, Vector pos) : Board(line, pos, type), room(room) {}
@@ -130,7 +128,7 @@ namespace AStrangeLabyrinth {
             while (ans == nullptr || ans->type < 4) {
                 std::vector<Ray::Board*> arr = root_room->get_boards();
                 Ray::Board *local_ans = nullptr;
-                float loc_S = 50;
+                float loc_S = 20;
 
                 for (int i = 0; i < arr.size(); ++i) {
                     if ((ans == nullptr || arr[i]->type != (ans->type + 2) % 4) && Ray::check_see_on_line(a, arr[i]->angs)) { // "delete" portal to previous room
@@ -160,6 +158,10 @@ namespace AStrangeLabyrinth {
             return {10, -1};
 		}
 
+		uchar now_col(uchar old, float dist) {
+            return std::min(std::max((int)(old * (20 - dist) / 20), 0), 255);
+		}
+
 		void draw_line(std::pair<float, char> data, int x, sf::RenderWindow& window, std::pair<sf::Color, sf::Color> textures, int h_x) {
             if (data.second != -1) {
                 sf::Color col_now;
@@ -171,7 +173,7 @@ namespace AStrangeLabyrinth {
                 float size_see = 0.5 / data.first;
 
                 sf::RectangleShape rect({h_x, window.getSize().y * size_see});
-                rect.setFillColor(col_now);
+                rect.setFillColor({now_col(col_now.r, data.first), now_col(col_now.g, data.first), now_col(col_now.b, data.first)});
                 rect.setPosition({x, window.getSize().y / 2 * (1 - size_see)});
 
                 window.draw(rect);
@@ -179,13 +181,13 @@ namespace AStrangeLabyrinth {
 		}
 
 		void draw_see(Tiles::Tile* tile, Vector pos, float a_see, float how_see, int n, int x, int y, int h_x, sf::RenderWindow& window) {
-            Ray::Room root_room = Ray::Room(tile, pos, a_see, how_see, nullptr);
+            Ray::Room root_room = Ray::Room(tile, pos, a_see, how_see, 255);
 
             x /= n;
 
             std::pair<float, char> *Ss = new std::pair<float, char>[n];
 
-            unsigned int count_th = std::max(std::thread::hardware_concurrency() - 1, (unsigned int)0);
+            unsigned int count_th = /*std::max(std::thread::hardware_concurrency() - 1, (unsigned int)0)*/0;
             unsigned int go = n / (count_th + 1);
             std::thread* threads[count_th];
 

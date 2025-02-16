@@ -57,7 +57,12 @@ namespace AStrangeLabyrinth {
                 Drawer::move_player(pos, tile, shift.rot(a).norm() * SPEED * add_speed * delta);
 
                 auto [w, h] = window.getSize();
-                window.clear(sf::Color::White);
+                window.clear({50, 50, 50});
+
+                sf::RectangleShape rect({w / scale_x, h / 2});
+                rect.setFillColor({100, 100, 100});
+
+                window.draw(rect);
 
                 Drawer::draw_see(tile, pos, a, Math::PI / 2, w / scale_x / h_x, w / scale_x, h, h_x, window);
 
