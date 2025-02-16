@@ -5,6 +5,8 @@ using namespace AStrangeLabyrinth;
 using namespace Screens;
 
 int main() {
+    srand(time(0));
+
     /*Tiles::Tile *q = new Tiles::Tile(), *w = new Tiles::Tile(), *e = new Tiles::Tile(), *r = new Tiles::Tile();
 
     q->go[0] = w;
