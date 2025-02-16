@@ -56,6 +56,9 @@ namespace AStrangeLabyrinth {
 
                 Drawer::move_player(pos, tile, shift.rot(a).norm() * SPEED * add_speed * delta);
 
+                if (tile->end)
+                    return;
+
                 auto [w, h] = window.getSize();
                 window.clear({50, 50, 50});
 
