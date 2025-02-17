@@ -31,12 +31,14 @@ namespace AStrangeLabyrinth {
                         if (use_mouse) sf::Mouse::setPosition({resized->size.x / 2, resized->size.y / 2}, window);
                     }
                     else if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
-                        if (key->scancode == sf::Keyboard::Scancode::LShift)
-                            add_speed = 1.5;
-                        else if (key->scancode == sf::Keyboard::Scancode::Escape) {
-                            use_mouse = !use_mouse;
-                            window.setMouseCursorVisible(!use_mouse);
-                            sf::Mouse::setPosition({window.getSize().x / 2, window.getSize().y / 2}, window);
+                        if (focus) {
+                            if (key->scancode == sf::Keyboard::Scancode::LShift)
+                                add_speed = 1.5;
+                            else if (key->scancode == sf::Keyboard::Scancode::Escape) {
+                                use_mouse = !use_mouse;
+                                window.setMouseCursorVisible(!use_mouse);
+                                sf::Mouse::setPosition({window.getSize().x / 2, window.getSize().y / 2}, window);
+                            }
                         }
                     } else if (const auto* key = event->getIf<sf::Event::KeyReleased>()) {
                         if (key->scancode == sf::Keyboard::Scancode::LShift)
