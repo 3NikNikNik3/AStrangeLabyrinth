@@ -37,15 +37,27 @@ int main() {
 
     room->update_boards();*/
 
+    sf::RenderWindow window(sf::VideoMode({800, 600}), "A strange labyrinth", sf::Style::Default);
+
+    ScreenStart main_screen;
+
+    main_screen.go(window);
+
+    window.close();
+
+    return 0;
+
     Tiles::Tile *room = Tiles::Generater::generate(Tiles::Generater::Settings(1, 1, 1, 3));
 
-    sf::RenderWindow window(sf::VideoMode({800, 600}), "A strange labyrinth", sf::Style::Default);
+    //sf::RenderWindow window(sf::VideoMode({800, 600}), "A strange labyrinth", sf::Style::Default);
 
     window.setFramerateLimit(30);
 
     ScreenDraw screen_main;
 
     screen_main.go(room, window);
+
+    window.close();
 
     delete room;
 

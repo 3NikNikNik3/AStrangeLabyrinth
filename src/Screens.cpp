@@ -25,7 +25,7 @@ namespace AStrangeLabyrinth {
             while (window.isOpen()) {
                 while (const std::optional event = window.pollEvent()) {
                     if (event->is<sf::Event::Closed>())
-                        window.close();
+                        return;
                     else if (const auto* resized = event->getIf<sf::Event::Resized>()) {
                         window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {resized->size.x / scale_x, resized->size.y})));
                         if (use_mouse) sf::Mouse::setPosition({resized->size.x / 2, resized->size.y / 2}, window);
@@ -98,6 +98,66 @@ namespace AStrangeLabyrinth {
                 window.draw(rect);
 
                 Drawer::draw_see(tile, pos, a, Math::PI / 2, w / scale_x / h_x, w / scale_x, h, h_x, window);
+
+                window.display();
+            }
+        }
+
+        // ScreenWithGUI
+
+        void ScreenWithGUI::draw(sf::RenderWindow& window) {
+            now_select %= arr.size();
+
+            for (int i = 0; i < arr.size(); ++i) {
+                arr[i]->draw(window, now_select == i);
+            }
+        }
+
+        void ScreenWithGUI::click(sf::RenderWindow& window, int x, int y) {
+            now_select %= arr.size();
+
+            sf::Vector2u scale_window = window.getSize();
+            for (int i = 0; i < arr.size(); ++i) {
+                arr[i]->click(scale_window, x, y);
+            }
+        }
+
+        void ScreenWithGUI::keydown(sf::Keyboard::Scancode key) {
+            now_select %= arr.size();
+
+            if (key == sf::Keyboard::Scancode::Tab)
+                now_select = (now_select + 1) % arr.size();
+            else
+                arr[now_select]->keydown(key);
+        }
+
+        // ScreenStart
+        ScreenStart::ScreenStart() : but_exit({0.5, 0, 0.5, -60}, {0, 100, 0, 100}, "images/exit.png"),
+                                     but_exit2({0.5, 0, 0.5, 60}, {0, 100, 0, 100}, "images/exit.png") {
+            arr.push_back(&but_exit);
+            arr.push_back(&but_exit2);
+        }
+
+        void ScreenStart::go(sf::RenderWindow& window) {
+            while (true) {
+                while (const std::optional event = window.pollEvent()) {
+                    if (event->is<sf::Event::Closed>())
+                        return;
+                    else if (const auto* key = event->getIf<sf::Event::KeyPressed>())
+                        keydown(key->scancode);
+                    else if (const auto* resized = event->getIf<sf::Event::Resized>())
+                        window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {resized->size.x, resized->size.y})));
+                    else if (const auto* but = event->getIf<sf::Event::MouseButtonPressed>())
+                        if (but->button == sf::Mouse::Button::Left)
+                            click(window, but->position.x, but->position.y);
+                }
+
+                if (but_exit.active_now())
+                    return;
+
+                window.clear({255, 255, 255});
+
+                draw(window);
 
                 window.display();
             }
