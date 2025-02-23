@@ -1,9 +1,12 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+
+#define uchar unsigned char
 
 namespace GUI {
     struct Scale {
@@ -46,4 +49,23 @@ namespace GUI {
 
         void keydown(sf::Keyboard::Scancode key);
 	};
+
+    class Check : public Element {
+        std::vector<sf::Texture> texturs;
+        std::vector<sf::Sprite> sprits;
+
+        sf::Texture name_texture;
+        sf::Sprite name_sprite;
+
+    public:
+        uchar choice;
+
+        Check(Scale pos, Scale scale, std::vector<std::string> paths, std::string path_name);
+
+        void draw(sf::RenderWindow& window, bool select);
+
+        void click(sf::Vector2u scale_window, float x, float y);
+
+        void keydown(sf::Keyboard::Scancode key);
+    };
 }

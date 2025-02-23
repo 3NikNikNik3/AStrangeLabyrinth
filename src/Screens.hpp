@@ -30,7 +30,8 @@ namespace AStrangeLabyrinth {
 		};
 
         class ScreenStart : public ScreenWithGUI {
-            GUI::Button but_exit, but_exit2;
+            GUI::Button but_exit;
+            GUI::Check check_exit;
 
         public:
             ScreenStart();
