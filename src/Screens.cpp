@@ -133,9 +133,11 @@ namespace AStrangeLabyrinth {
 
         // ScreenStart
         ScreenStart::ScreenStart() : but_exit({0.5, 0, 0.5, -60}, {0, 100, 0, 100}, "images/exit.png"),
-                                     check_exit({0.5, 0, 0.5, 60}, {0, 200, 0, 100}, {"images/exit_on.png", "images/exit_off.png"}, "images/exit_que.png") {
+                                     check_exit({0.5, 0, 0.5, 60}, {0, 200, 0, 100}, {"images/exit_on.png", "images/exit_off.png"}, "images/exit_que.png"),
+                                     number({0.5, 0, 0.2, 0}, {0, 200, 0, 100}, 1, 100, 5, "images/exit.png") {
             arr.push_back(&but_exit);
             arr.push_back(&check_exit);
+            arr.push_back(&number);
         }
 
         void ScreenStart::go(sf::RenderWindow& window) {
@@ -155,7 +157,7 @@ namespace AStrangeLabyrinth {
                 if (but_exit.active_now() && check_exit.choice == 0)
                     return;
 
-                window.clear({255, 255, 255});
+                window.clear({200, 200, 200});
 
                 draw(window);
 

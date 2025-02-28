@@ -70,9 +70,13 @@ namespace GUI {
 
         pos_ -= scale_ / 2.0f;
 
+        // Draw Name
+
         name_sprite.setPosition(pos_);
         name_sprite.setScale(get_scale({scale_.x / 2 - 10, scale_.y}, name_texture.getSize()));
         window.draw(name_sprite);
+
+        // Draw choice
 
         if (select) {
             sf::RectangleShape rect({scale_.x / 2 - 4, scale_.y + 6});
@@ -97,5 +101,68 @@ namespace GUI {
             choice = (choice - 1) % texturs.size();
         else if (key == sf::Keyboard::Scancode::Right || key == sf::Keyboard::Scancode::Enter)
             choice = (choice + 1) % texturs.size();
+    }
+
+    // Number
+    sf::Font Number::font("images/font.ttf");
+
+    Number::Number(Scale pos, Scale scale, unsigned int min_val, unsigned int max_val, unsigned int val, std::string name_texture_path) :
+        Element(pos, scale), min_val(min_val), max_val(max_val), val(val), name_texture(name_texture_path), name_sprite(name_texture), text(font),
+        add({pos.x + scale.x / 4, pos.x_ + scale.x_ / 4, pos.y - scale.y / 3, pos.y_ - scale.y_ / 3}, {scale.x / 2, scale.x_ / 2, scale.y / 3, scale.y_ / 3}, "images/add.png"),
+        minus_button({pos.x + scale.x / 4, pos.x_ + scale.x_ / 4, pos.y + scale.y / 3, pos.y_ + scale.y_ / 3}, {scale.x / 2, scale.x_ / 2, scale.y / 3, scale.y_ / 3}, "images/minus.png"){}
+
+    void Number::draw(sf::RenderWindow& window, bool select) {
+        // Draw Button
+        add.draw(window, false);
+        minus_button.draw(window, false);
+
+        sf::Vector2f pos_ = pos.get(window.getSize()), scale_ = scale.get(window.getSize());
+
+        // Draw Name
+
+        name_sprite.setPosition(pos_ - sf::Vector2f(scale_.x / 2, scale_.y / 2));
+        name_sprite.setScale(get_scale({scale_.x / 2 - 5, scale_.y}, name_texture.getSize()));
+        window.draw(name_sprite);
+
+        // Draw Text
+
+        // Select
+        if (select) {
+            sf::RectangleShape rect({scale_.x / 2 + 4, scale_.y / 3 - 5});
+            rect.setFillColor({0, 255, 0});
+            rect.setPosition(pos_ + sf::Vector2f(-2, -scale_.y / 6 + 2));
+            window.draw(rect);
+        }
+
+        // Background
+        sf::RectangleShape rect_text({scale_.x / 2, scale_.y / 3 - 10});
+        rect_text.setFillColor({180, 180, 180});
+        rect_text.setPosition(pos_ + sf::Vector2f(0, -scale_.y / 6 + 5));
+        window.draw(rect_text);
+
+        // Text
+        text.setString(std::to_string(val));
+        text.setPosition(pos_ + sf::Vector2f(scale_.x / 4 - std::min(scale_.x, (scale_.y / 3 - 10) * text.getString().getSize() / 4), -scale_.y / 6 + 2));
+        text.setCharacterSize(scale_.y / 3 - 10);
+        window.draw(text);
+    }
+
+    void Number::click(sf::Vector2u scale_window, float x, float y) {
+        add.click(scale_window, x, y);
+
+        if (add.active_now())
+            val = std::min(val + 1, max_val);
+
+        minus_button.click(scale_window, x, y);
+
+        if (minus_button.active_now())
+            val = std::max(val - 1, min_val);
+    }
+
+    void Number::keydown(sf::Keyboard::Scancode key) {
+        if (key == sf::Keyboard::Scancode::Up)
+            val = std::min(val + 1, max_val);
+        else if (key == sf::Keyboard::Scancode::Down)
+            val = std::max(val - 1, min_val);
     }
 }
