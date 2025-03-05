@@ -2,9 +2,14 @@
 
 namespace GUI {
 	// Scale
-    Scale::Scale(float x, int x_, float y, int y_) : x(x), x_(x_), y(y), y_(y_) {}
+    Scale::Scale(float x, int x_, float y, int y_, bool connect) : x(x), x_(x_), y(y), y_(y_), connect(connect) {}
 
     sf::Vector2f Scale::get(sf::Vector2u scale_window) {
+        if (connect) {
+            float ans = std::min(x_ + x * scale_window.x, y_ + y * scale_window.y);
+            return {ans, ans};
+        }
+
         return {x_ + x * scale_window.x, y_ + y * scale_window.y};
     }
 

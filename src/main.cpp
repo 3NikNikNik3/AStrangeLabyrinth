@@ -39,6 +39,8 @@ int main() {
 
     sf::RenderWindow window(sf::VideoMode({800, 600}), "A strange labyrinth", sf::Style::Default);
 
+    window.setFramerateLimit(30);
+
     ScreenStart main_screen;
 
     main_screen.go(window);
@@ -51,7 +53,7 @@ int main() {
 
     //sf::RenderWindow window(sf::VideoMode({800, 600}), "A strange labyrinth", sf::Style::Default);
 
-    window.setFramerateLimit(30);
+
 
     ScreenDraw screen_main;
 

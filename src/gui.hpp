@@ -12,8 +12,9 @@ namespace GUI {
     struct Scale {
         float x, y;
         int x_, y_;
+        bool connect;
 
-        Scale(float x, int x_, float y, int y_);
+        Scale(float x, int x_, float y, int y_, bool connect=false);
 
         sf::Vector2f get(sf::Vector2u scale_window);
     };

@@ -5,7 +5,7 @@
 namespace AStrangeLabyrinth {
 	namespace Screens {
 		// ScreenDraw
-		void ScreenDraw::go(Tiles::Tile* tile, sf::RenderWindow& window) {
+		bool ScreenDraw::go(Tiles::Tile* tile, sf::RenderWindow& window) {
             float a = 0;
             bool focus = true;
 
@@ -13,8 +13,8 @@ namespace AStrangeLabyrinth {
             bool use_mouse = false;
 
 
-            sf::View view(sf::FloatRect({0.f, 0.f}, {800.f, 600.f}));
-            window.setView(view);
+            /*sf::View view(sf::FloatRect({0.f, 0.f}, {800.f, 600.f}));
+            window.setView(view);*/
 
             Vector pos = {1.5f, 1.5f};
 
@@ -24,8 +24,10 @@ namespace AStrangeLabyrinth {
 
             while (window.isOpen()) {
                 while (const std::optional event = window.pollEvent()) {
-                    if (event->is<sf::Event::Closed>())
-                        return;
+                    if (event->is<sf::Event::Closed>()) {
+                        window.setMouseCursorVisible(true);
+                        return true;
+                    }
                     else if (const auto* resized = event->getIf<sf::Event::Resized>()) {
                         window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {resized->size.x / scale_x, resized->size.y})));
                         if (use_mouse) sf::Mouse::setPosition({resized->size.x / 2, resized->size.y / 2}, window);
@@ -86,8 +88,10 @@ namespace AStrangeLabyrinth {
 
                     Drawer::move_player(pos, tile, shift.rot(a).norm() * SPEED * add_speed * delta);
 
-                    if (tile->end)
-                        return;
+                    if (tile->end) {
+                        window.setMouseCursorVisible(true);
+                        return false;
+                    }
                 }
 
                 window.clear({50, 50, 50});
@@ -132,12 +136,14 @@ namespace AStrangeLabyrinth {
         }
 
         // ScreenStart
-        ScreenStart::ScreenStart() : but_exit({0.5, 0, 0.5, -60}, {0, 100, 0, 100}, "images/exit.png"),
-                                     check_exit({0.5, 0, 0.5, 60}, {0, 200, 0, 100}, {"images/exit_on.png", "images/exit_off.png"}, "images/exit_que.png"),
-                                     number({0.5, 0, 0.2, 0}, {0, 200, 0, 100}, 1, 100, 5, "images/exit.png") {
-            arr.push_back(&but_exit);
-            arr.push_back(&check_exit);
-            arr.push_back(&number);
+        ScreenStart::ScreenStart() : play({0.5, 0, 0.25, 0}, {0.5, 0, 0.1, 0, true}, "images/play.png"),
+                                     play_setting({0.5, 0, 0.45, 0}, {0.5, 0, 0.1, 0, true}, "images/play_setting.png"),
+                                     settings({0.5, 0, 0.65, 0}, {0.5, 0, 0.1, 0, true}, "images/settings.png"),
+                                     exit({0.5, 0, 0.85, 0}, {0.5, 0, 0.1, 0, true}, "images/exit.png") {
+            arr.push_back(&play);
+            arr.push_back(&play_setting);
+            arr.push_back(&settings);
+            arr.push_back(&exit);
         }
 
         void ScreenStart::go(sf::RenderWindow& window) {
@@ -154,7 +160,24 @@ namespace AStrangeLabyrinth {
                             click(window, but->position.x, but->position.y);
                 }
 
-                if (but_exit.active_now() && check_exit.choice == 0)
+                if (play.active_now()) {
+                    Tiles::Tile *room = Tiles::Generater::generate(Tiles::Generater::Settings(1, 1, 1, 3));
+                    bool res = main_loop.go(room, window);
+                    delete room;
+
+                    if (res)
+                        return;
+                }
+
+                if (play_setting.active_now()) {
+
+                }
+
+                if (settings.active_now()) {
+
+                }
+
+                if (exit.active_now())
                     return;
 
                 window.clear({200, 200, 200});

@@ -14,7 +14,7 @@ namespace AStrangeLabyrinth {
 		public:
             const float SPEED = 1;
 
-            void go(Tiles::Tile* tile, sf::RenderWindow& window);
+            bool go(Tiles::Tile* tile, sf::RenderWindow& window);
 		};
 
 		class ScreenWithGUI {
@@ -30,9 +30,9 @@ namespace AStrangeLabyrinth {
 		};
 
         class ScreenStart : public ScreenWithGUI {
-            GUI::Button but_exit;
-            GUI::Check check_exit;
-            GUI::Number number;
+            GUI::Button play, play_setting, settings, exit;
+
+            ScreenDraw main_loop;
 
         public:
             ScreenStart();
