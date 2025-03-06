@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Math.hpp"
+#include <fstream>
 
 #include <vector>
 
@@ -32,6 +33,12 @@ namespace AStrangeLabyrinth {
                 Settings(uchar depth_forks[3], uchar count_start_forks);
 
                 Settings(uchar start_depth, uchar midle_depth, uchar end_depth, uchar count_start_forks);
+
+                friend std::ifstream& operator>>(std::ifstream& in, Settings& setting);
+
+                friend std::ofstream& operator<<(std::ofstream& out, Settings& setting);
+
+                static bool ok(std::string name);
             };
 
             Tile* generate_rooms(Settings settings, Tile *p = nullptr, uchar from_ = -1, uchar S = 0);

@@ -78,6 +78,37 @@ namespace AStrangeLabyrinth {
 
             Settings::Settings(uchar start_depth, uchar midle_depth, uchar end_depth, uchar count_start_forks) : depth_forks({start_depth, midle_depth, end_depth}), count_start_forks(count_start_forks) {}
 
+            std::ifstream& operator>>(std::ifstream& in, Settings& setting) {
+                for (int i = 0; i < 3; ++i)
+                    in >> setting.depth_forks[i];
+
+                in >> setting.count_start_forks;
+
+                return in;
+            }
+
+            std::ofstream& operator<<(std::ofstream& out, Settings& setting) {
+                for (int i = 0; i < 3; ++i)
+                    out << setting.depth_forks[i];
+
+                out << setting.count_start_forks;
+
+                return out;
+            }
+
+            bool Settings::ok(std::string name) {
+                std::ifstream in(name);
+
+                int i = 0;
+                for (; i < 4 && !in.eof(); ++i) {
+                    in.get();
+                }
+
+                in.close();
+
+                return i == 4;
+            }
+
             // Generate
             std::vector<Tile*> ends;
 

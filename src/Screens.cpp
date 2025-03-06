@@ -1,5 +1,8 @@
 #include "Screens.hpp"
 
+#include <filesystem>
+#include <fstream>
+
 #include "Drawer.hpp"
 
 namespace AStrangeLabyrinth {
@@ -170,7 +173,8 @@ namespace AStrangeLabyrinth {
                 }
 
                 if (play_setting.active_now()) {
-
+                    if (play_setting_screen.go(window))
+                        return;
                 }
 
                 if (settings.active_now()) {
@@ -179,6 +183,89 @@ namespace AStrangeLabyrinth {
 
                 if (exit.active_now())
                     return;
+
+                window.clear({200, 200, 200});
+
+                draw(window);
+
+                window.display();
+            }
+        }
+
+        // ScreenPlaySetting
+        ScreenPlaySetting::ScreenPlaySetting() : name("last.alaby"),
+                                                 back_but({0, 35, 0, 35}, {0, 50, 0, 50, true}, "images/back.png"),
+                                                 load({1, -35, 0, 35}, {0, 50, 0, 50, true}, "images/load.png"),
+                                                 save_but({1, -95, 0, 35}, {0, 50, 0, 50, true}, "images/save.png"),
+                                                 play({1, -155, 0, 35}, {0, 50, 0, 50, true}, "images/play.png") {
+                arr.push_back(&back_but);
+                arr.push_back(&load);
+
+                arr.push_back(&save_but);
+                arr.push_back(&play);
+
+                if (std::filesystem::exists("data/last.alaby")) {
+                    std::ifstream file("data/last.alaby");
+
+                    if (Tiles::Generater::Settings::ok("data/last.alaby"))
+                        file >> setting;
+
+                    file.close();
+                }
+        }
+
+        void ScreenPlaySetting::save() {
+            if (!std::filesystem::exists("data"))
+                std::filesystem::create_directories("data");
+
+            std::ofstream file("data/" + name);
+            file << setting;
+            file.close();
+        }
+
+        bool ScreenPlaySetting::go(sf::RenderWindow& window) {
+            while (true) {
+                while (const std::optional event = window.pollEvent()) {
+                    if (event->is<sf::Event::Closed>())
+                        return true;
+                    else if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
+                        keydown(key->scancode);
+
+                        if (key->scancode == sf::Keyboard::Scancode::Enter && now_select == 1)
+                            now_select = arr.size() - 1;
+                    }
+                    else if (const auto* resized = event->getIf<sf::Event::Resized>())
+                        window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {resized->size.x, resized->size.y})));
+                    else if (const auto* but = event->getIf<sf::Event::MouseButtonPressed>())
+                        if (but->button == sf::Mouse::Button::Left)
+                            click(window, but->position.x, but->position.y);
+                }
+
+                if (back_but.active_now()) {
+                    return false;
+                }
+
+                if (load.active_now()) {
+
+                }
+
+                if (save_but.active_now()) {
+                    save();
+                }
+
+                if (play.active_now()) {
+                    save();
+
+                    Tiles::Tile *room = Tiles::Generater::generate(setting);
+
+                    bool res = main_loop.go(room, window);
+
+                    delete room;
+
+                    if (res)
+                        return true;
+                    return false;
+                }
 
                 window.clear({200, 200, 200});
 

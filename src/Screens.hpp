@@ -29,10 +29,28 @@ namespace AStrangeLabyrinth {
             void keydown(sf::Keyboard::Scancode key);
 		};
 
+		class ScreenPlaySetting : public ScreenWithGUI {
+            ScreenDraw main_loop;
+
+            Tiles::Generater::Settings setting;
+            std::string name;
+
+            GUI::Button back_but, play, load, save_but;
+
+            void save();
+
+        public:
+            ScreenPlaySetting();
+
+            bool go(sf::RenderWindow& window);
+        };
+
         class ScreenStart : public ScreenWithGUI {
             GUI::Button play, play_setting, settings, exit;
 
             ScreenDraw main_loop;
+
+            ScreenPlaySetting play_setting_screen;
 
         public:
             ScreenStart();
