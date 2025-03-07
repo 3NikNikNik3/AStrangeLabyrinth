@@ -3,6 +3,11 @@
 #include <filesystem>
 #include <fstream>
 #include <ctime>
+#include <iostream>
+
+#ifdef __linux__
+    #include <cstdio>
+#endif
 
 #include "Drawer.hpp"
 
@@ -196,35 +201,37 @@ namespace AStrangeLabyrinth {
         // ScreenPlaySetting
         ScreenPlaySetting::ScreenPlaySetting() : name("last.alaby"),
                                                  back_but({0, 35, 0, 35}, {0, 50, 0, 50, true}, "images/back.png"),
-                                                 load({1, -35, 0, 35}, {0, 50, 0, 50, true}, "images/load.png"),
+                                                 load_but({1, -35, 0, 35}, {0, 50, 0, 50, true}, "images/load.png"),
                                                  save_but({1, -95, 0, 35}, {0, 50, 0, 50, true}, "images/save.png"),
                                                  play({1, -155, 0, 35}, {0, 50, 0, 50, true}, "images/play.png"),
                                                  start_tile({0.25, 0, 0.19, 50}, {0, 200, 0, 100}, 1, 4, 0, "images/start_tile.png"),
                                                  count_forks({ GUI::Number({0.25, 0, 0.38, 50}, {0, 200, 0, 100}, 0, 254, 0, "images/count_forks0.png"),
                                                                GUI::Number({0.25, 0, 0.57, 50}, {0, 200, 0, 100}, 0, 254, 0, "images/count_forks1.png"),
                                                                GUI::Number({0.25, 0, 0.76, 50}, {0, 200, 0, 100}, 0, 254, 0, "images/count_forks2.png")}) {
-                if (std::filesystem::exists("data/last.alaby")) {
-                    std::ifstream file("data/last.alaby");
-
-                    if (Tiles::Generater::Settings::ok("data/last.alaby"))
-                        file >> setting;
-
-                    file.close();
-                }
-
                 arr.push_back(&back_but);
-                arr.push_back(&load);
+                arr.push_back(&load_but);
 
                 arr.push_back(&start_tile);
-                start_tile.val = setting.count_start_forks;
 
-                for (int i = 0; i < 3; ++i) {
+                for (int i = 0; i < 3; ++i)
                     arr.push_back(&count_forks[i]);
-                    count_forks[i].val = setting.depth_forks[i];
-                }
 
                 arr.push_back(&save_but);
                 arr.push_back(&play);
+
+                if (std::filesystem::exists("data/last.alaby") && Tiles::Generater::Settings::ok("data/last.alaby")) {
+                    load("data/last.alaby");
+                } else {
+                    start_tile.val = setting.count_start_forks;
+                    for (int i = 0; i < 3; ++i)
+                        count_forks[i].val = setting.depth_forks[i];
+                }
+
+                #ifdef __linux__
+
+                path_me = std::filesystem::current_path();
+
+                #endif
         }
 
         void ScreenPlaySetting::save() {
@@ -234,6 +241,46 @@ namespace AStrangeLabyrinth {
             std::ofstream file("data/" + name);
             file << setting;
             file.close();
+        }
+
+        void ScreenPlaySetting::load(std::string from) {
+            std::ifstream file(from);
+
+            file >> setting;
+
+            file.close();
+
+            start_tile.val = setting.count_start_forks;
+            for (int i = 0; i < 3; ++i)
+                count_forks[i].val = setting.depth_forks[i];
+
+            int i = from.size() - 1;
+            while (i > -1 && from[i] != '/' && from[i] != '\\') --i;
+
+            name = from.substr(i + 1, from.size() - i - 1);
+        }
+
+        std::string ScreenPlaySetting::chose_file() {
+            std::string res = "";
+
+            #ifdef __linux__
+
+            std::string command = "zenity --file-selection --file-filter=*.?laby --filename=" + path_me;
+            FILE *chose = popen(command.data(), "r");
+            char buf[1024];
+
+            while (fgets(buf, sizeof(buf), chose) != nullptr)
+                res += std::string(buf);
+
+            pclose(chose);
+
+            res = res.substr(0, res.size() - 1);
+
+            #endif
+
+            if (res != "" && std::filesystem::exists(res))
+                return res;
+            return "";
         }
 
         bool ScreenPlaySetting::go(sf::RenderWindow& window) {
@@ -262,8 +309,11 @@ namespace AStrangeLabyrinth {
                     return false;
                 }
 
-                if (load.active_now()) {
-
+                if (load_but.active_now()) {
+                    std::string new_name = chose_file();
+                    if (new_name != "" && new_name.size() >= 6 && new_name.substr(new_name.size() - 6, 6) == ".alaby" && Tiles::Generater::Settings::ok(new_name)) {
+                        load(new_name);
+                    }
                 }
 
                 if (save_but.active_now()) {

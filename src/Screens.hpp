@@ -35,11 +35,21 @@ namespace AStrangeLabyrinth {
             Tiles::Generater::Settings setting;
             std::string name;
 
-            GUI::Button back_but, play, load, save_but;
+            GUI::Button back_but, play, load_but, save_but;
 
             GUI::Number start_tile, count_forks[3];
 
             void save();
+
+            void load(std::string from);
+
+            std::string chose_file();
+
+            #ifdef __linux__
+
+            std::string path_me;
+
+            #endif
 
         public:
             ScreenPlaySetting();
