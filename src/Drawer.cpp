@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <thread>
 
+#include <filesystem>
+#include <fstream>
+
 namespace AStrangeLabyrinth {
 	namespace Drawer {
 		namespace Ray {
@@ -111,6 +114,40 @@ namespace AStrangeLabyrinth {
                 delete room;
             }
 		}
+
+		// Setting
+		uchar Setting::h_x = 1, Setting::scale_x = 1;
+
+        unsigned short Setting::mouse_speed = 300;
+
+        bool Setting::use_mouse = false;
+
+        void Setting::load() {
+            if (std::filesystem::exists("data/setting.data")) {
+                std::ifstream file("data/setting.data");
+
+                h_x = file.get();
+                scale_x = file.get();
+                mouse_speed = file.get() * 256 + file.get();
+
+                use_mouse = file.get();
+
+                file.close();
+            }
+        }
+
+        void Setting::save() {
+            if (!std::filesystem::exists("data"))
+                std::filesystem::create_directories("data");
+
+            std::ofstream file("data/setting.data");
+
+            file << h_x << scale_x;
+            file << (char)(mouse_speed / 256) << (char)(mouse_speed % 256);
+            file << (char)use_mouse;
+
+            file.close();
+        }
 
 		void calculate_lines(std::pair<float, char> *Ss_ans, int s, int e, Ray::Room* root_room, Vector pos, float a, float how_see, int n) {
             for (int i = s; i < e; ++i)

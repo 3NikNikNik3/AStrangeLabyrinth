@@ -5,6 +5,8 @@ using namespace AStrangeLabyrinth;
 using namespace Screens;
 
 int main() {
+    Drawer::Setting::load();
+
     srand(time(0));
 
     /*Tiles::Tile *q = new Tiles::Tile(), *w = new Tiles::Tile(), *e = new Tiles::Tile(), *r = new Tiles::Tile();
@@ -47,21 +49,7 @@ int main() {
 
     window.close();
 
+    Drawer::Setting::save();
+
     return 0;
-
-    Tiles::Tile *room = Tiles::Generater::generate(Tiles::Generater::Settings(1, 1, 1, 3));
-
-    //sf::RenderWindow window(sf::VideoMode({800, 600}), "A strange labyrinth", sf::Style::Default);
-
-
-
-    ScreenDraw screen_main;
-
-    screen_main.go(room, window);
-
-    window.close();
-
-    delete room;
-
-	return 0;
 }

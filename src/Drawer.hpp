@@ -59,6 +59,20 @@ namespace AStrangeLabyrinth {
             };
 		}
 
+		class Setting {
+		public:
+
+            static uchar h_x, scale_x;
+
+            static unsigned short mouse_speed;
+
+            static bool use_mouse;
+
+            static void save();
+
+            static void load();
+		};
+
 		void draw_line(float S, int x, sf::RenderWindow& window, std::pair<sf::Color, sf::Color> textures, int h_x);
 
 		void calculate_lines(std::pair<float, char> *Ss_ans, int s, int e, Ray::Room* root_room, Vector pos, float a, float how_see, int n);

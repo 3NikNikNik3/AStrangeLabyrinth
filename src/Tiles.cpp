@@ -80,9 +80,9 @@ namespace AStrangeLabyrinth {
 
             std::ifstream& operator>>(std::ifstream& in, Settings& setting) {
                 for (int i = 0; i < 3; ++i)
-                    in >> setting.depth_forks[i];
+                    setting.depth_forks[i] = in.get();
 
-                in >> setting.count_start_forks;
+                setting.count_start_forks = in.get();
 
                 return in;
             }
