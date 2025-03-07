@@ -160,7 +160,7 @@ namespace GUI {
 
         minus_button.click(scale_window, x, y);
 
-        if (minus_button.active_now())
+        if (minus_button.active_now() && val != 0)
             val = std::max(val - 1, min_val);
     }
 

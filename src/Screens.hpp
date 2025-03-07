@@ -37,6 +37,8 @@ namespace AStrangeLabyrinth {
 
             GUI::Button back_but, play, load, save_but;
 
+            GUI::Number start_tile, count_forks[3];
+
             void save();
 
         public:

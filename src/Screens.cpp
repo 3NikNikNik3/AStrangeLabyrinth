@@ -198,13 +198,11 @@ namespace AStrangeLabyrinth {
                                                  back_but({0, 35, 0, 35}, {0, 50, 0, 50, true}, "images/back.png"),
                                                  load({1, -35, 0, 35}, {0, 50, 0, 50, true}, "images/load.png"),
                                                  save_but({1, -95, 0, 35}, {0, 50, 0, 50, true}, "images/save.png"),
-                                                 play({1, -155, 0, 35}, {0, 50, 0, 50, true}, "images/play.png") {
-                arr.push_back(&back_but);
-                arr.push_back(&load);
-
-                arr.push_back(&save_but);
-                arr.push_back(&play);
-
+                                                 play({1, -155, 0, 35}, {0, 50, 0, 50, true}, "images/play.png"),
+                                                 start_tile({0.25, 0, 0.19, 50}, {0, 200, 0, 100}, 1, 4, 0, "images/start_tile.png"),
+                                                 count_forks({ GUI::Number({0.25, 0, 0.38, 50}, {0, 200, 0, 100}, 0, 254, 0, "images/count_forks0.png"),
+                                                               GUI::Number({0.25, 0, 0.57, 50}, {0, 200, 0, 100}, 0, 254, 0, "images/count_forks1.png"),
+                                                               GUI::Number({0.25, 0, 0.76, 50}, {0, 200, 0, 100}, 0, 254, 0, "images/count_forks2.png")}) {
                 if (std::filesystem::exists("data/last.alaby")) {
                     std::ifstream file("data/last.alaby");
 
@@ -213,6 +211,20 @@ namespace AStrangeLabyrinth {
 
                     file.close();
                 }
+
+                arr.push_back(&back_but);
+                arr.push_back(&load);
+
+                arr.push_back(&start_tile);
+                start_tile.val = setting.count_start_forks;
+
+                for (int i = 0; i < 3; ++i) {
+                    arr.push_back(&count_forks[i]);
+                    count_forks[i].val = setting.depth_forks[i];
+                }
+
+                arr.push_back(&save_but);
+                arr.push_back(&play);
         }
 
         void ScreenPlaySetting::save() {
@@ -241,6 +253,10 @@ namespace AStrangeLabyrinth {
                         if (but->button == sf::Mouse::Button::Left)
                             click(window, but->position.x, but->position.y);
                 }
+
+                setting.count_start_forks = start_tile.val;
+                for (int i = 0; i < 3; ++i)
+                    setting.depth_forks[i] = count_forks[i].val;
 
                 if (back_but.active_now()) {
                     return false;
