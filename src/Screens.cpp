@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <ctime>
 
 #include "Drawer.hpp"
 
@@ -250,6 +251,22 @@ namespace AStrangeLabyrinth {
                 }
 
                 if (save_but.active_now()) {
+                    if (name == "last.alaby") {
+                        tm date_now;
+                        std::time_t time_now = time(0);
+
+                        date_now = *std::localtime(&time_now);
+
+                        name = std::to_string(date_now.tm_year + 1900) + "." + std::to_string(date_now.tm_mon + 1) + "." +
+                               std::to_string(date_now.tm_mday) + "." + std::to_string(date_now.tm_hour) + "." +
+                               std::to_string(date_now.tm_min) + "." + std::to_string(date_now.tm_sec);
+
+                        while (std::filesystem::exists(name + ".alaby"))
+                            name += "_";
+
+                        name += ".alaby";
+                    }
+
                     save();
                 }
 
