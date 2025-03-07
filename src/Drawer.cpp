@@ -1,7 +1,6 @@
 #include "Drawer.hpp"
 
 #include <algorithm>
-#include <iostream>
 #include <thread>
 
 namespace AStrangeLabyrinth {

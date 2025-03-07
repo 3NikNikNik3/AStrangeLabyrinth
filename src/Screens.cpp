@@ -3,7 +3,6 @@
 #include <filesystem>
 #include <fstream>
 #include <ctime>
-#include <iostream>
 
 #ifdef __linux__
     #include <cstdio>
@@ -292,7 +291,7 @@ namespace AStrangeLabyrinth {
 			
 			ofn.lpstrFile[0] = '\0';
 			ofn.nMaxFile = sizeof(szFile);
-			ofn.lpstrFilter = "All\0*.*\0Text\0*.TXT\0";
+			ofn.lpstrFilter = "A/The labyrinth\0*.alaby;*.tlaby\0";
 			ofn.nFilterIndex = 1;
 			
 			if (GetOpenFileName(&ofn))
