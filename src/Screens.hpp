@@ -35,8 +35,21 @@ namespace AStrangeLabyrinth {
             bool go(sf::RenderWindow& window);
         };
 
+        class ScreenPause : public ScreenWithGUI {
+            GUI::Button play, setting_but, exit, save;
+
+            GUI::Check use_mouse;
+
+            ScreenSetting setting_screen;
+
+        public:
+            ScreenPause();
+
+            uchar go(sf::RenderWindow& window);
+        };
+
 		class ScreenDraw {
-            ScreenSetting setting;
+            ScreenPause pause;
 
 		public:
             const float SPEED = 1;
