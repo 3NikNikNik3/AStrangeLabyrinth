@@ -10,14 +10,7 @@
 
 namespace AStrangeLabyrinth {
 	namespace Screens {
-		class ScreenDraw {
-		public:
-            const float SPEED = 1;
-
-            bool go(Tiles::Tile* tile, sf::RenderWindow& window);
-		};
-
-		class ScreenWithGUI {
+        class ScreenWithGUI {
         protected:
             std::vector<GUI::Element*> arr;
             int now_select = 0;
@@ -27,6 +20,28 @@ namespace AStrangeLabyrinth {
             void click(sf::RenderWindow& window, int x, int y);
 
             void keydown(sf::Keyboard::Scancode key);
+		};
+
+        class ScreenSetting : public ScreenWithGUI {
+            GUI::Button back_but;
+
+            GUI::Number h_x, scale_x, mouse_speed;
+
+            GUI::Check use_mouse;
+
+        public:
+            ScreenSetting();
+
+            bool go(sf::RenderWindow& window);
+        };
+
+		class ScreenDraw {
+            ScreenSetting setting;
+
+		public:
+            const float SPEED = 1;
+
+            bool go(Tiles::Tile* tile, sf::RenderWindow& window);
 		};
 
 		class ScreenPlaySetting : public ScreenWithGUI {
@@ -63,6 +78,8 @@ namespace AStrangeLabyrinth {
             ScreenDraw main_loop;
 
             ScreenPlaySetting play_setting_screen;
+
+            ScreenSetting setting_screen;
 
         public:
             ScreenStart();

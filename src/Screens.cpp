@@ -29,6 +29,11 @@ namespace AStrangeLabyrinth {
 
             sf::Clock clock;
 
+            if (Drawer::Setting::use_mouse) {
+                sf::Mouse::setPosition({window.getSize().x / 2, window.getSize().y / 2}, window);
+                window.setMouseCursorVisible(false);
+            }
+
             while (window.isOpen()) {
                 while (const std::optional event = window.pollEvent()) {
                     if (event->is<sf::Event::Closed>()) {
@@ -44,9 +49,22 @@ namespace AStrangeLabyrinth {
                             if (key->scancode == sf::Keyboard::Scancode::LShift)
                                 add_speed = 1.5;
                             else if (key->scancode == sf::Keyboard::Scancode::Escape) {
-                                Drawer::Setting::use_mouse = !Drawer::Setting::use_mouse;
+                                /*Drawer::Setting::use_mouse = !Drawer::Setting::use_mouse;
                                 window.setMouseCursorVisible(!Drawer::Setting::use_mouse);
-                                sf::Mouse::setPosition({window.getSize().x / 2, window.getSize().y / 2}, window);
+                                sf::Mouse::setPosition({window.getSize().x / 2, window.getSize().y / 2}, window);*/
+
+                                if (Drawer::Setting::use_mouse) {
+                                    sf::Mouse::setPosition({window.getSize().x / 2, window.getSize().y / 2}, window);
+                                    window.setMouseCursorVisible(true);
+                                }
+
+                                if (setting.go(window))
+                                    return true;
+
+                                if (Drawer::Setting::use_mouse) {
+                                    sf::Mouse::setPosition({window.getSize().x / 2, window.getSize().y / 2}, window);
+                                    window.setMouseCursorVisible(false);
+                                }
                             }
                         }
                     } else if (const auto* key = event->getIf<sf::Event::KeyReleased>()) {
@@ -182,7 +200,8 @@ namespace AStrangeLabyrinth {
                 }
 
                 if (settings.active_now()) {
-
+                    if (setting_screen.go(window))
+                        return;
                 }
 
                 if (exit.active_now())
@@ -364,6 +383,60 @@ namespace AStrangeLabyrinth {
 
                     if (res)
                         return true;
+                    return false;
+                }
+
+                window.clear({200, 200, 200});
+
+                draw(window);
+
+                window.display();
+            }
+        }
+
+        using Setting = Drawer::Setting;
+
+        // ScreenSetting
+        ScreenSetting::ScreenSetting() : back_but({0, 20, 0, 20}, {0, 30, 0, 30}, "images/back.png"),
+                                         h_x({0.5, 0, 1/9.0, 0}, {0, 200, 0, 100}, 1, 255, 1, "images/h_x.png"),
+                                         scale_x({0.5, 0, 1/3.0, 0}, {0, 200, 0, 100}, 1, 255, 1, "images/scale_x.png"),
+                                         mouse_speed({0.5, 0, 5/9.0, 0}, {0, 200, 0, 100}, 1, 65535, 100, "images/mouse_speed.png"),
+                                         use_mouse({0.5, 0, 7/9.0, 0}, {0, 200, 0, 100}, {"images/no.png", "images/yes.png"}, "images/use_mouse.png") {
+            arr.push_back(&back_but);
+            arr.push_back(&h_x);
+            arr.push_back(&scale_x);
+            arr.push_back(&mouse_speed);
+            arr.push_back(&use_mouse);
+        }
+
+        bool ScreenSetting::go(sf::RenderWindow& window) {
+            h_x.val = Setting::h_x;
+            scale_x.val = Setting::scale_x;
+            mouse_speed.val = Setting::mouse_speed;
+            use_mouse.choice = Setting::use_mouse;
+
+            while (true) {
+                while (const std::optional event = window.pollEvent()) {
+                    if (event->is<sf::Event::Closed>())
+                        return true;
+                    else if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
+                        keydown(key->scancode);
+                    }
+                    else if (const auto* resized = event->getIf<sf::Event::Resized>())
+                        window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {resized->size.x, resized->size.y})));
+                    else if (const auto* but = event->getIf<sf::Event::MouseButtonPressed>())
+                        if (but->button == sf::Mouse::Button::Left)
+                            click(window, but->position.x, but->position.y);
+                }
+
+                if (back_but.active_now()) {
+                    Setting::h_x = h_x.val;
+                    Setting::scale_x = scale_x.val;
+                    Setting::mouse_speed = mouse_speed.val;
+                    Setting::use_mouse = use_mouse.choice == 1;
+
+                    Setting::save();
+
                     return false;
                 }
 
