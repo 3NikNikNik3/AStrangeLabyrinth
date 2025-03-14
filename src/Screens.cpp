@@ -16,7 +16,7 @@
 namespace AStrangeLabyrinth {
 	namespace Screens {
 		// ScreenDraw
-		bool ScreenDraw::go(Tiles::Tile* tile, sf::RenderWindow& window) {
+		bool ScreenDraw::go(Tiles::Tile* tile, sf::RenderWindow& window, unsigned int seed, Tiles::Generater::Settings& setting) {
             float a = 0;
             bool focus = true;
 
@@ -58,7 +58,7 @@ namespace AStrangeLabyrinth {
                                     window.setMouseCursorVisible(true);
                                 }
 
-                                if (uchar what = pause.go(window))
+                                if (uchar what = pause.go(window, seed, setting))
                                     return what - 1 == 1;
 
                                 if (Drawer::Setting::use_mouse) {
@@ -186,9 +186,10 @@ namespace AStrangeLabyrinth {
                 }
 
                 if (play.active_now()) {
-                    Tiles::Tile *room = Tiles::Generater::generate(Tiles::Generater::Settings(1, 1, 1, 3));
-                    bool res = main_loop.go(room, window);
-                    delete room;
+                    Tiles::Generater::Settings setting(1, 1, 1, 3);
+                    std::pair<Tiles::Tile*, unsigned int> room = Tiles::Generater::generate(setting);
+                    bool res = main_loop.go(room.first, window, room.second, setting);
+                    delete room.first;
 
                     if (res)
                         return;
@@ -277,6 +278,34 @@ namespace AStrangeLabyrinth {
             name = from.substr(i + 1, from.size() - i - 1);
         }
 
+        unsigned int ScreenPlaySetting::load_with_seed(std::string from) {
+            std::ifstream file(from);
+
+            file >> setting;
+
+            unsigned int res = 0, p = 1;
+
+            for (int i = 0; i < 4; ++i) {
+                res += p * file.get();
+
+                p *= 256;
+            }
+
+            file.close();
+
+            start_tile.val = setting.count_start_forks;
+            for (int i = 0; i < 3; ++i)
+                count_forks[i].val = setting.depth_forks[i];
+
+            int i = from.size() - 1;
+            while (i > -1 && from[i] != '/' && from[i] != '\\') --i;
+
+            name = from.substr(i + 1, from.size() - i - 1);
+            name[name.size() - 5] = 'a';
+
+            return res;
+        }
+
         std::string ScreenPlaySetting::chose_file() {
             std::string res = "";
 
@@ -349,6 +378,18 @@ namespace AStrangeLabyrinth {
                     std::string new_name = chose_file();
                     if (new_name != "" && new_name.size() >= 6 && new_name.substr(new_name.size() - 6, 6) == ".alaby" && Tiles::Generater::Settings::ok(new_name)) {
                         load(new_name);
+                    } else if (new_name != "" && new_name.size() >= 6 && new_name.substr(new_name.size() - 6, 6) == ".tlaby" && Tiles::Generater::Settings::ok(new_name)) {
+                        unsigned int seed = load_with_seed(new_name);
+
+                        Tiles::Tile *room = Tiles::Generater::generate(setting, seed);
+
+                        bool res = main_loop.go(room, window, seed, setting);
+
+                        delete room;
+
+                        if (res)
+                            return true;
+                        return false;
                     }
                 }
 
@@ -375,11 +416,11 @@ namespace AStrangeLabyrinth {
                 if (play.active_now()) {
                     save();
 
-                    Tiles::Tile *room = Tiles::Generater::generate(setting);
+                    std::pair<Tiles::Tile*, unsigned int> room = Tiles::Generater::generate(setting);
 
-                    bool res = main_loop.go(room, window);
+                    bool res = main_loop.go(room.first, window, room.second, setting);
 
-                    delete room;
+                    delete room.first;
 
                     if (res)
                         return true;
@@ -461,7 +502,7 @@ namespace AStrangeLabyrinth {
             arr.push_back(&save);
         }
 
-        uchar ScreenPause::go(sf::RenderWindow& window) {
+        uchar ScreenPause::go(sf::RenderWindow& window, unsigned int seed, Tiles::Generater::Settings& setting) {
             use_mouse.choice = Setting::use_mouse;
 
             bool move_ = true;
@@ -511,7 +552,34 @@ namespace AStrangeLabyrinth {
                 }
 
                 if (save.active_now()) {
+                    tm date_now;
+                    std::time_t time_now = time(0);
 
+                    date_now = *std::localtime(&time_now);
+
+                    std::string name = std::to_string(date_now.tm_year + 1900) + "." + std::to_string(date_now.tm_mon + 1) + "." +
+                                       std::to_string(date_now.tm_mday) + "." + std::to_string(date_now.tm_hour) + "." +
+                                       std::to_string(date_now.tm_min) + "." + std::to_string(date_now.tm_sec);
+
+                    while (std::filesystem::exists(name + ".tlaby"))
+                        name += "_";
+
+                    name += ".tlaby";
+
+                    if (!std::filesystem::exists("data"))
+                        std::filesystem::create_directories("data");
+
+                    std::ofstream file("data/" + name);
+
+                    file << setting;
+
+                    for (int i = 0, seed_ = seed; i < 4; ++i) {
+                        file << (uchar)(seed_ % 256);
+
+                        seed_ /= 256;
+                    }
+
+                    file.close();
                 }
 
                 window.clear({200, 200, 200});

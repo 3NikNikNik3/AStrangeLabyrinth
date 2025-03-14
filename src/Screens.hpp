@@ -45,7 +45,7 @@ namespace AStrangeLabyrinth {
         public:
             ScreenPause();
 
-            uchar go(sf::RenderWindow& window);
+            uchar go(sf::RenderWindow& window, unsigned int seed, Tiles::Generater::Settings& setting);
         };
 
 		class ScreenDraw {
@@ -54,7 +54,7 @@ namespace AStrangeLabyrinth {
 		public:
             const float SPEED = 1;
 
-            bool go(Tiles::Tile* tile, sf::RenderWindow& window);
+            bool go(Tiles::Tile* tile, sf::RenderWindow& window, unsigned int seed, Tiles::Generater::Settings& setting);
 		};
 
 		class ScreenPlaySetting : public ScreenWithGUI {
@@ -70,6 +70,8 @@ namespace AStrangeLabyrinth {
             void save();
 
             void load(std::string from);
+
+            unsigned int load_with_seed(std::string from);
 
             std::string chose_file();
 

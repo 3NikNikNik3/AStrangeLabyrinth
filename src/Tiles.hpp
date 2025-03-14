@@ -43,7 +43,9 @@ namespace AStrangeLabyrinth {
 
             Tile* generate_rooms(Settings settings, Tile *p = nullptr, uchar from_ = -1, uchar S = 0);
 
-            Tile* generate(Settings settings);
+            std::pair<Tile*, unsigned int> generate(Settings settings);
+
+            Tile* generate(Settings settings, unsigned int seed);
 		}
 	}
 }

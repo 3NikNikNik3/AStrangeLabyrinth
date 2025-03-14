@@ -185,7 +185,16 @@ namespace AStrangeLabyrinth {
                 return res;
             }
 
-            Tile* generate(Settings settings) {
+            std::pair<Tile*, unsigned int> generate(Settings settings) {
+                // To delete the information of time from seed
+                unsigned int seed = time(0) / 10000 * 10000 + (rand() % 1000) * 10 + time(0) % 10;
+
+                return {generate(settings, seed), seed};
+            }
+
+            Tile* generate(Settings settings, unsigned int seed) {
+                srand(seed);
+
                 Tile* ans = generate_rooms(settings);
 
                 // chose end room
