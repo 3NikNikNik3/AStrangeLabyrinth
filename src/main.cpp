@@ -39,7 +39,7 @@ int main() {
 
     sf::RenderWindow window(sf::VideoMode({800, 600}), "A strange labyrinth", sf::Style::Default);
 
-    window.setFramerateLimit(30);
+    window.setFramerateLimit(Drawer::Setting::fps);
 
     ScreenStart main_screen;
 

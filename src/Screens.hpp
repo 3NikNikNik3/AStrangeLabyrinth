@@ -25,7 +25,7 @@ namespace AStrangeLabyrinth {
         class ScreenSetting : public ScreenWithGUI {
             GUI::Button back_but;
 
-            GUI::Number h_x, scale_x, mouse_speed;
+            GUI::Number h_x, scale_x, mouse_speed, fps;
 
             GUI::Check use_mouse;
 

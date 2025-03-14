@@ -116,7 +116,7 @@ namespace AStrangeLabyrinth {
 		}
 
 		// Setting
-		uchar Setting::h_x = 1, Setting::scale_x = 1;
+		uchar Setting::h_x = 1, Setting::scale_x = 1, Setting::fps = 60;
 
         unsigned short Setting::mouse_speed = 300;
 
@@ -128,6 +128,7 @@ namespace AStrangeLabyrinth {
 
                 h_x = file.get();
                 scale_x = file.get();
+                fps = file.get();
                 mouse_speed = file.get() * 256 + file.get();
 
                 use_mouse = file.get();
@@ -142,7 +143,7 @@ namespace AStrangeLabyrinth {
 
             std::ofstream file("data/setting.data");
 
-            file << h_x << scale_x;
+            file << h_x << scale_x << fps;
             file << (char)(mouse_speed / 256) << (char)(mouse_speed % 256);
             file << (char)use_mouse;
 

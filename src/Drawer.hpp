@@ -62,7 +62,7 @@ namespace AStrangeLabyrinth {
 		class Setting {
 		public:
 
-            static uchar h_x, scale_x;
+            static uchar h_x, scale_x, fps;
 
             static unsigned short mouse_speed;
 

@@ -155,19 +155,19 @@ namespace GUI {
     void Number::click(sf::Vector2u scale_window, float x, float y) {
         add.click(scale_window, x, y);
 
-        if (add.active_now())
-            val = std::min(val + 1, max_val);
+        if (add.active_now() && val < max_val)
+            ++val;
 
         minus_button.click(scale_window, x, y);
 
-        if (minus_button.active_now() && val != 0)
-            val = std::max(val - 1, min_val);
+        if (minus_button.active_now() && val > min_val)
+            --val;
     }
 
     void Number::keydown(sf::Keyboard::Scancode key) {
-        if (key == sf::Keyboard::Scancode::Up)
-            val = std::min(val + 1, max_val);
-        else if (key == sf::Keyboard::Scancode::Down)
-            val = std::max(val - 1, min_val);
+        if (key == sf::Keyboard::Scancode::Up && val < max_val)
+            ++val;
+        else if (key == sf::Keyboard::Scancode::Down && val > min_val)
+            --val;
     }
 }
