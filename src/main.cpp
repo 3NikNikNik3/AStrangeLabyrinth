@@ -1,10 +1,15 @@
 #include "Screens.hpp"
 #include "Drawer.hpp"
 
+#include <filesystem>
+#include <fstream>
+
+#include <iostream>
+
 using namespace AStrangeLabyrinth;
 using namespace Screens;
 
-int main() {
+int main(int argc, char* argv[]) {
     Drawer::Setting::load();
 
     /*Tiles::Tile *q = new Tiles::Tile(), *w = new Tiles::Tile(), *e = new Tiles::Tile(), *r = new Tiles::Tile();
@@ -41,9 +46,63 @@ int main() {
 
     window.setFramerateLimit(Drawer::Setting::fps);
 
-    ScreenStart main_screen;
+    std::cerr << "\033[31m";
 
-    main_screen.go(window);
+    if (argc == 1) {
+        // Norm game
+
+        ScreenStart main_screen;
+
+        main_screen.go(window);
+    } else if (argc == 2) {
+        // Load a/the laby.
+
+        std::string name(argv[1]);
+
+        if (std::filesystem::exists(name) && name.size() >= 6 && (name.substr(name.size() - 6, 6) == ".alaby" || name.substr(name.size() - 6, 6) == ".tlaby") && Tiles::Generater::Settings::ok(name)) {
+            if (name[name.size() - 5] == 'a') {
+                // A laby.
+
+                ScreenPlaySetting screen_setting;
+                screen_setting.load(name);
+                screen_setting.go(window);
+            } else {
+                // The laby.
+
+                // load
+
+                std::ifstream file(name);
+
+                Tiles::Generater::Settings setting;
+
+                file >> setting;
+
+                unsigned int seed = 0, p = 1;
+
+                for (int i = 0; i < 4; ++i) {
+                    seed += p * file.get();
+
+                    p *= 256;
+                }
+
+                file.close();
+
+                // play
+
+                Tiles::Tile *tile = Tiles::Generater::generate(setting, seed);
+
+                ScreenDraw game;
+
+                game.go(tile, window, seed, setting);
+
+                delete tile;
+            }
+        } else {
+            std::cerr << "Error: no file or file is'n .alaby (.tlaby)" << std::endl;
+        }
+    } else {
+        std::cerr << "Error: many arg. AStrangeLabyrinth OR AStrangeLabyrinth <path>" << std::endl;
+    }
 
     window.close();
 

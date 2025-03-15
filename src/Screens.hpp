@@ -69,8 +69,6 @@ namespace AStrangeLabyrinth {
 
             void save();
 
-            void load(std::string from);
-
             unsigned int load_with_seed(std::string from);
 
             std::string chose_file();
@@ -85,6 +83,8 @@ namespace AStrangeLabyrinth {
             ScreenPlaySetting();
 
             bool go(sf::RenderWindow& window);
+
+            void load(std::string from);
         };
 
         class ScreenStart : public ScreenWithGUI {
