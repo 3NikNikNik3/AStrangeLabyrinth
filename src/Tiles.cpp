@@ -99,14 +99,18 @@ namespace AStrangeLabyrinth {
             bool Settings::ok(std::string name) {
                 std::ifstream in(name);
 
+                int ok_i = 4;
+                if (name[name.size() - 5] == 't')
+                    ok_i = 8;
+
                 int i = 0;
-                for (; i < 4 && !in.eof(); ++i) {
+                for (; i < ok_i && !in.eof(); ++i) {
                     in.get();
                 }
 
                 in.close();
 
-                return i == 4;
+                return i == ok_i;
             }
 
             // Generate
