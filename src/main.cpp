@@ -46,8 +46,6 @@ int main(int argc, char* argv[]) {
 
     window.setFramerateLimit(Drawer::Setting::fps);
 
-    std::cerr << "\033[31m";
-
     if (argc == 1) {
         // Norm game
 
@@ -55,6 +53,8 @@ int main(int argc, char* argv[]) {
 
         main_screen.go(window);
     } else if (argc == 2) {
+        std::cerr << "\033[31m";
+
         // Load a/the laby.
 
         std::string name(argv[1]);

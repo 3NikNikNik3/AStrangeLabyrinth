@@ -204,8 +204,20 @@ namespace AStrangeLabyrinth {
                 sf::Color col_now;
                 if (data.second == 4)
                     col_now = textures.first;
-                else
+                else if (data.second == 5)
                     col_now = textures.second;
+                else if (data.second == 6) {
+                    float q = (2 - data.first) / 2;
+                    if (q < -0.5)
+                        q = -0.5;
+                    else if (q > 0.5)
+                        q = 0.5;
+                    q += 0.5;
+
+                    col_now = { textures.first.r * q + textures.second.r * (1 - q),
+                                textures.first.g * q + textures.second.g * (1 - q),
+                                textures.first.b * q + textures.second.b * (1 - q) };
+                }
 
                 float size_see = 0.5 / data.first;
 
@@ -224,7 +236,7 @@ namespace AStrangeLabyrinth {
 
             std::pair<float, char> *Ss = new std::pair<float, char>[n];
 
-            unsigned int count_th = /*std::max(std::thread::hardware_concurrency() - 1, (unsigned int)0)*/0;
+            unsigned int count_th = std::max(std::thread::hardware_concurrency() - 1, (unsigned int)0);
             unsigned int go = n / (count_th + 1);
             std::thread* threads[count_th];
 

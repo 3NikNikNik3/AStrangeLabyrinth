@@ -10,9 +10,11 @@ namespace AStrangeLabyrinth {
 
         Tile::~Tile() {
             is_delete = true;
-            for (int i = 0; i < 4; ++i)
-                if (go[i] != nullptr && !go[i]->is_delete)
+            for (int i = 0; i < 4; ++i) {
+                if (go[i] != nullptr && !go[i]->is_delete) {
                     delete go[i];
+                }
+            }
             delete[] go;
         }
 
@@ -74,13 +76,28 @@ namespace AStrangeLabyrinth {
 
         namespace Generater {
             // Settings
-            Settings::Settings(uchar depth_forks[3], uchar count_start_forks) : depth_forks({depth_forks[0], depth_forks[1], depth_forks[2]}), count_start_forks(count_start_forks) {}
+            Settings::Settings(uchar depth_forks[3], uchar count_start_forks, uchar end_event[4]) :
+                depth_forks({depth_forks[0], depth_forks[1], depth_forks[2]}),
+                count_start_forks(count_start_forks),
+                end_event({end_event[0], end_event[1], end_event[2], end_event[3]}),
+                sum_end_event(end_event[0] + end_event[1] + end_event[2] + end_event[3]) {}
 
-            Settings::Settings(uchar start_depth, uchar midle_depth, uchar end_depth, uchar count_start_forks) : depth_forks({start_depth, midle_depth, end_depth}), count_start_forks(count_start_forks) {}
+            Settings::Settings(uchar start_depth, uchar midle_depth, uchar end_depth, uchar count_start_forks,
+                               uchar simple_end, uchar end_corridor, uchar end_rotation, uchar end_fake) :
+                depth_forks({start_depth, midle_depth, end_depth}),
+                count_start_forks(count_start_forks),
+                end_event({simple_end, end_corridor, end_rotation, end_fake}),
+                sum_end_event(simple_end + end_corridor + end_rotation + end_fake) {}
 
             std::ifstream& operator>>(std::ifstream& in, Settings& setting) {
                 for (int i = 0; i < 3; ++i)
                     setting.depth_forks[i] = in.get();
+
+                setting.sum_end_event = 0;
+                for (int i = 0; i < 4; ++i) {
+                    setting.end_event[i] = in.get();
+                    setting.sum_end_event += setting.end_event[i];
+                }
 
                 setting.count_start_forks = in.get();
 
@@ -91,6 +108,9 @@ namespace AStrangeLabyrinth {
                 for (int i = 0; i < 3; ++i)
                     out << setting.depth_forks[i];
 
+                for (int i = 0; i < 4; ++i)
+                    out << setting.end_event[i];
+
                 out << setting.count_start_forks;
 
                 return out;
@@ -99,9 +119,9 @@ namespace AStrangeLabyrinth {
             bool Settings::ok(std::string name) {
                 std::ifstream in(name);
 
-                int ok_i = 4;
+                int ok_i = 8;
                 if (name[name.size() - 5] == 't')
-                    ok_i = 8;
+                    ok_i = 12;
 
                 int i = 0;
                 for (; i < ok_i && !in.eof(); ++i) {
@@ -206,6 +226,77 @@ namespace AStrangeLabyrinth {
 
                 ends[who]->end = true;
                 ends[who]->update_boards();
+
+                ends.erase(ends.begin() + who);
+
+                // chose end event room
+                std::vector<bool> used(ends.size(), true);
+                for (int i = 0; i < ends.size(); ++i) {
+                    if (used[i]) {
+                        // chose event
+                        int what = rand() % settings.sum_end_event;
+                        for (int i = 0; i < 4; ++i) {
+                            if (what < settings.end_event[i]) {
+                                what = i;
+                                break;
+                            }
+                            what -= settings.end_event[i];
+                        }
+
+                        // set event
+                        uchar come_where;
+                        for (int j = 0; j < 4; ++j)
+                            if (ends[i]->go[j] != nullptr) {
+                                come_where = j;
+                                break;
+                            }
+
+                        Tile *tiles[4];
+                        Tile *in;
+                        int who_sec, who_old;
+
+                        switch (what) {
+                            case 1: // endless corridor
+                                ends[i]->go[(come_where + 1) % 4] = ends[i];
+                                ends[i]->go[(come_where + 3) % 4] = ends[i];
+
+                                ends[i]->update_boards();
+                                break;
+
+                            case 2: // endless rotation
+                                for (int i = 0; i < 4; ++i)
+                                    tiles[i] = new Tile();
+                                for (int i = 0; i < 4; ++i) {
+                                    tiles[i]->go[i] = tiles[(i + 1) % 4];
+                                    tiles[(i + 1) % 4]->go[(i + 2) % 4] = tiles[i];
+
+                                    tiles[i]->go[(i + 2) % 4] = tiles[i]->go[(i + 3) % 4] = nullptr;
+                                }
+
+                                in = new Tile();
+                                in->go[come_where] = ends[i];
+                                ends[i]->go[(come_where + 2) % 4] = in;
+
+                                tiles[come_where]->go[(come_where + 1) % 4] = in;
+                                in->go[(come_where + 3) % 4] = tiles[come_where];
+
+                                in->go[(come_where + 1) % 4] = in->go[(come_where + 2) % 4] = nullptr;
+
+                                for (int i = 0; i < 4; ++i)
+                                    tiles[i]->update_boards();
+
+                                in->update_boards();
+                                ends[i]->update_boards();
+
+                                break;
+
+                            case 3: // fake end
+                                ends[i]->boards[come_where + 1].second = 6;
+
+                                break;
+                        }
+                    }
+                }
 
                 ends.clear();
 

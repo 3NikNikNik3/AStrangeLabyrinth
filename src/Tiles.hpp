@@ -28,11 +28,16 @@ namespace AStrangeLabyrinth {
 
                 uchar count_start_forks = 4; // [1; 4]
 
+                // 0 - nothing, 1 - endless corridor, 2 - endless rotation, 3 - fake end
+                uchar end_event[4] = {2, 1, 1, 0};
+                unsigned short sum_end_event = 0;
+
                 Settings() = default;
 
-                Settings(uchar depth_forks[3], uchar count_start_forks);
+                Settings(uchar depth_forks[3], uchar count_start_forks, uchar end_event[4]);
 
-                Settings(uchar start_depth, uchar midle_depth, uchar end_depth, uchar count_start_forks);
+                Settings(uchar start_depth, uchar midle_depth, uchar end_depth, uchar count_start_forks,
+                         uchar simple_end, uchar end_corridor, uchar end_rotation, uchar end_fake);
 
                 friend std::ifstream& operator>>(std::ifstream& in, Settings& setting);
 

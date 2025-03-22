@@ -65,6 +65,8 @@ namespace AStrangeLabyrinth {
                                     sf::Mouse::setPosition({window.getSize().x / 2, window.getSize().y / 2}, window);
                                     window.setMouseCursorVisible(false);
                                 }
+
+                                clock.restart().asSeconds();
                             }
                         }
                     } else if (const auto* key = event->getIf<sf::Event::KeyReleased>()) {
@@ -186,7 +188,7 @@ namespace AStrangeLabyrinth {
                 }
 
                 if (play.active_now()) {
-                    Tiles::Generater::Settings setting(1, 1, 1, 3);
+                    Tiles::Generater::Settings setting(1, 1, 1, 3, 2, 1, 1, 0);
                     std::pair<Tiles::Tile*, unsigned int> room = Tiles::Generater::generate(setting);
                     bool res = main_loop.go(room.first, window, room.second, setting);
                     delete room.first;
