@@ -63,6 +63,10 @@ namespace AStrangeLabyrinth {
 
                 perp = (line.b - line.a).rot90();
             }
+			
+			Board::~Board() {
+				
+			}
 
             // Room
             Room::Room(Tiles::Tile* tile, Vector pos, float a_see, float how_see, uchar from, uchar S) : tile(tile), pos(pos), a_see(a_see), how_see(how_see) {

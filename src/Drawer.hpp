@@ -29,6 +29,8 @@ namespace AStrangeLabyrinth {
                 uchar type; // 0-3 portal, 4 - norm, 5 - door
 
                 Board(Line line, Vector pos, uchar type);
+				
+				virtual ~Board();
             };
 
             class Room {

@@ -19,9 +19,8 @@ namespace AStrangeLabyrinth {
 		bool ScreenDraw::go(Tiles::Tile* tile, sf::RenderWindow& window, unsigned int seed, Tiles::Generater::Settings& setting) {
             float a = 0;
             bool focus = true;
-
-            /*sf::View view(sf::FloatRect({0.f, 0.f}, {800.f, 600.f}));
-            window.setView(view);*/
+			
+			window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {window.getSize().x / Drawer::Setting::scale_x, window.getSize().y})));
 
             Vector pos = {1.5f, 1.5f};
 
@@ -57,9 +56,13 @@ namespace AStrangeLabyrinth {
                                     sf::Mouse::setPosition({window.getSize().x / 2, window.getSize().y / 2}, window);
                                     window.setMouseCursorVisible(true);
                                 }
+								
+								window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {window.getSize().x, window.getSize().y})));
 
                                 if (uchar what = pause.go(window, seed, setting))
                                     return what - 1 == 1;
+								
+								window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {window.getSize().x / Drawer::Setting::scale_x, window.getSize().y})));
 
                                 if (Drawer::Setting::use_mouse) {
                                     sf::Mouse::setPosition({window.getSize().x / 2, window.getSize().y / 2}, window);
@@ -117,6 +120,7 @@ namespace AStrangeLabyrinth {
 
                     if (tile->end) {
                         window.setMouseCursorVisible(true);
+						window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {window.getSize().x, window.getSize().y})));
                         return false;
                     }
                 }
