@@ -12,7 +12,17 @@ FetchContent_MakeAvailable(SFML)
 
 add_subdirectory(src)
 
-add_executable(AStrangeLabyrinth src/main.cpp)
+if (build_static)
+	set(CMAKE_EXE_LINKER_FLAGS "-static")
+endif()
+
+if (WIN32)
+	add_executable(AStrangeLabyrinth WIN32 src/main.cpp)
+	#set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}" -static-libgcc -static-libstdc++")
+else()
+	add_executable(AStrangeLabyrinth src/main.cpp)
+endif()
 
 target_link_libraries(src SFML::Graphics)
+
 target_link_libraries(AStrangeLabyrinth src)
