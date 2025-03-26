@@ -75,7 +75,7 @@ namespace AStrangeLabyrinth {
                         if (tile->boards[i].second > 3 )
                             boards.push_back(new Board(tile->boards[i].first, pos, tile->boards[i].second));
                         else {
-                            if (tile->boards[i].second == from || S >= 20) ;
+                            if (tile->boards[i].second == from || S >= 7) ;
                                 //boards.push_back(new Portal(tile->boards[i].first, tile->boards[i].second, nullptr, pos));
                             else
                                 boards.push_back(new Portal(tile->boards[i].first, tile->boards[i].second, tile->go[tile->boards[i].second], pos, a_see, how_see, tile->boards[i].second, S + 1));
