@@ -63,9 +63,9 @@ namespace AStrangeLabyrinth {
 
                 perp = (line.b - line.a).rot90();
             }
-			
+
 			Board::~Board() {
-				
+
 			}
 
             // Room
@@ -204,14 +204,19 @@ namespace AStrangeLabyrinth {
 		}
 
 		void draw_line(std::pair<float, char> data, int x, sf::RenderWindow& window, std::pair<sf::Color, sf::Color> textures, int h_x) {
-            if (data.second != -1) {
-                sf::Color col_now;
-                if (data.second == 4)
+            sf::Color col_now;
+            float q;
+            switch (data.second) {
+                case 4:
                     col_now = textures.first;
-                else if (data.second == 5)
+                    break;
+
+                case 5:
                     col_now = textures.second;
-                else if (data.second == 6) {
-                    float q = (2 - data.first) / 2;
+                    break;
+
+                case 6:
+                    q = (2 - data.first) / 2;
                     if (q < -0.5)
                         q = -0.5;
                     else if (q > 0.5)
@@ -221,16 +226,21 @@ namespace AStrangeLabyrinth {
                     col_now = { textures.first.r * q + textures.second.r * (1 - q),
                                 textures.first.g * q + textures.second.g * (1 - q),
                                 textures.first.b * q + textures.second.b * (1 - q) };
-                }
+                    break;
 
-                float size_see = 0.5 / data.first;
-
-                sf::RectangleShape rect({h_x, window.getSize().y * size_see});
-                rect.setFillColor({now_col(col_now.r, data.first), now_col(col_now.g, data.first), now_col(col_now.b, data.first)});
-                rect.setPosition({x, window.getSize().y / 2 * (1 - size_see)});
-
-                window.draw(rect);
+                default:
+                    data.first = 20;
+                    col_now = textures.first;
+                    break;
             }
+
+            float size_see = 0.5 / data.first;
+
+            sf::RectangleShape rect({h_x, window.getSize().y * size_see});
+            rect.setFillColor({now_col(col_now.r, data.first), now_col(col_now.g, data.first), now_col(col_now.b, data.first)});
+            rect.setPosition({x, window.getSize().y / 2 * (1 - size_see)});
+
+            window.draw(rect);
 		}
 
 		void draw_see(Tiles::Tile* tile, Vector pos, float a_see, float how_see, int n, int x, int y, int h_x, sf::RenderWindow& window) {
