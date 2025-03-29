@@ -19,7 +19,7 @@ namespace AStrangeLabyrinth {
 		bool ScreenDraw::go(Tiles::Tile* tile, sf::RenderWindow& window, unsigned int seed, Tiles::Generater::Settings& setting) {
             float a = 0;
             bool focus = true;
-			
+
 			window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {window.getSize().x / Drawer::Setting::scale_x, window.getSize().y})));
 
             Vector pos = {1.5f, 1.5f};
@@ -56,12 +56,12 @@ namespace AStrangeLabyrinth {
                                     sf::Mouse::setPosition({window.getSize().x / 2, window.getSize().y / 2}, window);
                                     window.setMouseCursorVisible(true);
                                 }
-								
+
 								window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {window.getSize().x, window.getSize().y})));
 
                                 if (uchar what = pause.go(window, seed, setting))
                                     return what - 1 == 1;
-								
+
 								window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {window.getSize().x / Drawer::Setting::scale_x, window.getSize().y})));
 
                                 if (Drawer::Setting::use_mouse) {
@@ -231,7 +231,14 @@ namespace AStrangeLabyrinth {
                                                  start_tile({0.25, 0, 0.19, 50}, {0, 200, 0, 100}, 1, 4, 0, "images/start_tile.png"),
                                                  count_forks({ GUI::Number({0.25, 0, 0.38, 50}, {0, 200, 0, 100}, 0, 254, 0, "images/count_forks0.png"),
                                                                GUI::Number({0.25, 0, 0.57, 50}, {0, 200, 0, 100}, 0, 254, 0, "images/count_forks1.png"),
-                                                               GUI::Number({0.25, 0, 0.76, 50}, {0, 200, 0, 100}, 0, 254, 0, "images/count_forks2.png")}) {
+                                                               GUI::Number({0.25, 0, 0.76, 50}, {0, 200, 0, 100}, 0, 254, 0, "images/count_forks2.png") }),
+                                                 ends({ GUI::Number({0.75, 0, 3.0/11, 50}, {0, 200, 0, 100}, 0, 254, 0, "images/end_nothing.png"),
+                                                        GUI::Number({0.75, 0, 5.0/11, 50}, {0, 200, 0, 100}, 0, 254, 0, "images/end_cor.png"),
+                                                        GUI::Number({0.75, 0, 7.0/11, 50}, {0, 200, 0, 100}, 0, 254, 0, "images/end_rot.png"),
+                                                        GUI::Number({0.75, 0, 9.0/11, 50}, {0, 200, 0, 100}, 0, 254, 0, "images/end_fake.png") }),
+                                                 end_what_tex("images/what_end.png"), end_what(end_what_tex) {
+                end_what.setScale({100.0 / end_what_tex.getSize().x, 100.0 / end_what_tex.getSize().y});
+
                 arr.push_back(&back_but);
                 arr.push_back(&load_but);
 
@@ -239,6 +246,9 @@ namespace AStrangeLabyrinth {
 
                 for (int i = 0; i < 3; ++i)
                     arr.push_back(&count_forks[i]);
+
+                for (int i = 0; i < 4; ++i)
+                    arr.push_back(&ends[i]);
 
                 arr.push_back(&save_but);
                 arr.push_back(&play);
@@ -249,6 +259,8 @@ namespace AStrangeLabyrinth {
                     start_tile.val = setting.count_start_forks;
                     for (int i = 0; i < 3; ++i)
                         count_forks[i].val = setting.depth_forks[i];
+                    for (int i = 0; i < 4; ++i)
+                        ends[i].val = setting.end_event[i];
                 }
 
                 #ifdef __linux__
@@ -277,6 +289,8 @@ namespace AStrangeLabyrinth {
             start_tile.val = setting.count_start_forks;
             for (int i = 0; i < 3; ++i)
                 count_forks[i].val = setting.depth_forks[i];
+            for (int i = 0; i < 4; ++i)
+                ends[i].val = setting.end_event[i];
 
             int i = from.size() - 1;
             while (i > -1 && from[i] != '/' && from[i] != '\\') --i;
@@ -302,6 +316,8 @@ namespace AStrangeLabyrinth {
             start_tile.val = setting.count_start_forks;
             for (int i = 0; i < 3; ++i)
                 count_forks[i].val = setting.depth_forks[i];
+            for (int i = 0; i < 4; ++i)
+                ends[i].val = setting.end_event[i];
 
             int i = from.size() - 1;
             while (i > -1 && from[i] != '/' && from[i] != '\\') --i;
@@ -375,6 +391,18 @@ namespace AStrangeLabyrinth {
                 setting.count_start_forks = start_tile.val;
                 for (int i = 0; i < 3; ++i)
                     setting.depth_forks[i] = count_forks[i].val;
+                int sum_ends = 0;
+                for (int i = 0; i < 4; ++i) {
+                    setting.end_event[i] = ends[i].val;
+                    sum_ends += ends[i].val;
+                }
+
+                if (sum_ends == 0) {
+                    setting.sum_end_event = 1;
+                    setting.end_event[0] = 1;
+                    ends[0].val = 1;
+                } else
+                    setting.sum_end_event = sum_ends;
 
                 if (back_but.active_now()) {
                     return false;
@@ -436,6 +464,9 @@ namespace AStrangeLabyrinth {
                 window.clear({200, 200, 200});
 
                 draw(window);
+
+                end_what.setPosition({ 0.75 * window.getSize().x - 50, 1.0/11 * window.getSize().y });
+                window.draw(end_what);
 
                 window.display();
             }

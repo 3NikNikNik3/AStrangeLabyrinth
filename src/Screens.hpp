@@ -65,7 +65,10 @@ namespace AStrangeLabyrinth {
 
             GUI::Button back_but, play, load_but, save_but;
 
-            GUI::Number start_tile, count_forks[3];
+            GUI::Number start_tile, count_forks[3], ends[4];
+
+            sf::Texture end_what_tex;
+            sf::Sprite end_what;
 
             void save();
 
