@@ -371,6 +371,8 @@ namespace AStrangeLabyrinth {
         }
 
         bool ScreenPlaySetting::go(sf::RenderWindow& window) {
+            now_select = 0;
+
             while (true) {
                 while (const std::optional event = window.pollEvent()) {
                     if (event->is<sf::Event::Closed>())
@@ -490,6 +492,8 @@ namespace AStrangeLabyrinth {
         }
 
         bool ScreenSetting::go(sf::RenderWindow& window) {
+            now_select = 0;
+
             h_x.val = Setting::h_x;
             scale_x.val = Setting::scale_x;
             mouse_speed.val = Setting::mouse_speed;
@@ -547,6 +551,8 @@ namespace AStrangeLabyrinth {
 
         uchar ScreenPause::go(sf::RenderWindow& window, unsigned int seed, Tiles::Generater::Settings& setting) {
             use_mouse.choice = Setting::use_mouse;
+
+            now_select = 0;
 
             bool move_ = true;
 
