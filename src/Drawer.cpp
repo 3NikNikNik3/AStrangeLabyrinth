@@ -72,7 +72,7 @@ namespace AStrangeLabyrinth {
             Room::Room(Tiles::Tile* tile, Vector pos, float a_see, float how_see, uchar from, uchar S) : tile(tile), pos(pos), a_see(a_see), how_see(how_see) {
                 for (int i = 0; i < tile->boards.size(); ++i) {
                     if (check_line_on_see(tile->boards[i].first, pos, a_see, how_see)) {
-                        if (tile->boards[i].second > 3 )
+                        if (tile->boards[i].second > 3)
                             boards.push_back(new Board(tile->boards[i].first, pos, tile->boards[i].second));
                         else {
                             if (tile->boards[i].second == from || S >= 7) ;

@@ -291,7 +291,23 @@ namespace AStrangeLabyrinth {
                                 break;
 
                             case 3: // fake end
-                                ends[i]->boards[come_where + 1].second = 6;
+                                //ends[i]->boards[5].second = 6;
+                                //ends[i]->update_boards();
+
+                                switch (come_where) {
+                                    case 0:
+                                        ends[i]->boards[4].second = 6;
+                                        break;
+                                    case 1:
+                                        ends[i]->boards[4].second = 6;
+                                        break;
+                                    case 2:
+                                        ends[i]->boards[0].second = 6;
+                                        break;
+                                    case 3:
+                                        ends[i]->boards[1].second = 6;
+                                        break;
+                                }
 
                                 break;
                         }
