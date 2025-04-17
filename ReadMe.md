@@ -104,7 +104,7 @@ cursor...
 ## General:
 I wanted to break the rule `left + right = right + left`, to create a labyrinth that cannot be represented on a map (classical). And I did it: the entire labyrinth is divided into rooms, and each exit from a room leads to a separate room (to better understand, I recommend settings 4-0-4-1).
 
-![video](images_readme/video.mp4)
+https://github.com/user-attachments/assets/9cc43a0d-f165-4ce4-909c-dc2c4675ba12
 
 ![video field](images_readme/video_field.png)
 
