@@ -180,4 +180,4 @@ The probability of each type = `set number` / `sum of all numbers`.
 - The engine allows for any walls with integer coordinates for the ends in rooms, but to maintain the feeling of corridors
 - If you somehow get outside the walls, you can bypass the labyrinth from the side, but the rendering will be broken. By the way, let me know how you did it; that's a bug!
 
-# [ReadMe on Rus](https://github.com/3NikNikNik3/AStrangeLabyrinth/blob/main/README_ru.md)
+# [ReadMe on Rus](https://github.com/3NikNikNik3/AStrangeLabyrinth/blob/main/ReadMe_ru.md)
