@@ -44,6 +44,12 @@ int main(int argc, char* argv[]) {
 
     sf::RenderWindow window(sf::VideoMode({800, 600}), "A strange labyrinth", sf::Style::Default);
 
+    sf::Image icon;
+    if (icon.loadFromFile("images/icon.png")) { // else: without icon is ok
+        window.setIcon(icon);
+        //window.setIcon({64, 64}, icon.getPixelsPtr());
+    }
+
     window.setFramerateLimit(Drawer::Setting::fps);
 
     if (argc == 1) {
