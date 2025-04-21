@@ -29,7 +29,7 @@ namespace AStrangeLabyrinth {
                 uchar type; // 0-3 portal, 4 - norm, 5 - door
 
                 Board(Line line, Vector pos, uchar type);
-				
+
 				virtual ~Board();
             };
 
@@ -68,7 +68,7 @@ namespace AStrangeLabyrinth {
 
             static unsigned short mouse_speed;
 
-            static bool use_mouse;
+            static bool use_mouse, view_fps;
 
             static void save();
 

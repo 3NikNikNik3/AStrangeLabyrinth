@@ -27,7 +27,7 @@ namespace AStrangeLabyrinth {
 
             GUI::Number h_x, scale_x, mouse_speed, fps;
 
-            GUI::Check use_mouse;
+            GUI::Check use_mouse, view_fps;
 
         public:
             ScreenSetting();
@@ -51,8 +51,14 @@ namespace AStrangeLabyrinth {
 		class ScreenDraw {
             ScreenPause pause;
 
+            static sf::Font font;
+
+            sf::Text text;
+
 		public:
             const float SPEED = 1;
+
+            ScreenDraw();
 
             bool go(Tiles::Tile* tile, sf::RenderWindow& window, unsigned int seed, Tiles::Generater::Settings& setting);
 		};

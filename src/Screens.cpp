@@ -16,6 +16,14 @@
 namespace AStrangeLabyrinth {
 	namespace Screens {
 		// ScreenDraw
+		sf::Font ScreenDraw::font("images/font.ttf");
+
+		ScreenDraw::ScreenDraw() : text(font) {
+            text.setFillColor({0, 255, 0});
+            text.setPosition({2, 2});
+            text.setCharacterSize(40);
+		}
+
 		bool ScreenDraw::go(Tiles::Tile* tile, sf::RenderWindow& window, unsigned int seed, Tiles::Generater::Settings& setting) {
             float a = 0;
             bool focus = true;
@@ -69,7 +77,7 @@ namespace AStrangeLabyrinth {
                                     window.setMouseCursorVisible(false);
                                 }
 
-                                clock.restart().asSeconds();
+                                clock.restart();
                             }
                         }
                     } else if (const auto* key = event->getIf<sf::Event::KeyReleased>()) {
@@ -125,6 +133,7 @@ namespace AStrangeLabyrinth {
                     }
                 }
 
+                // Clear window
                 window.clear({50, 50, 50});
 
                 sf::RectangleShape rect({w / Drawer::Setting::scale_x, h / 2});
@@ -132,7 +141,14 @@ namespace AStrangeLabyrinth {
 
                 window.draw(rect);
 
+                // Draw rooms
                 Drawer::draw_see(tile, pos, a, Math::PI / 2, w / Drawer::Setting::scale_x / Drawer::Setting::h_x, w / Drawer::Setting::scale_x, h, Drawer::Setting::h_x, window);
+
+                // Draw fps
+                if (Drawer::Setting::view_fps) {
+                    text.setString(std::to_string((int)(1 / delta)));
+                    window.draw(text);
+                }
 
                 window.display();
             }
@@ -478,17 +494,19 @@ namespace AStrangeLabyrinth {
 
         // ScreenSetting
         ScreenSetting::ScreenSetting() : back_but({0, 20, 0, 20}, {0, 30, 0, 30}, "images/back.png"),
-                                         h_x({0.5, 0, 1/11.0, 0}, {0, 200, 0, 100}, 1, 255, 1, "images/h_x.png"),
-                                         scale_x({0.5, 0, 3/11.0, 0}, {0, 200, 0, 100}, 1, 255, 1, "images/scale_x.png"),
-                                         mouse_speed({0.5, 0, 5/11.0, 0}, {0, 200, 0, 100}, 1, 65535, 100, "images/mouse_speed.png"),
-                                         use_mouse({0.5, 0, 7/11.0, 0}, {0, 200, 0, 100}, {"images/no.png", "images/yes.png"}, "images/use_mouse.png"),
-                                         fps({0.5, 0, 9/11.0, 0}, {0, 200, 0, 100}, 0, 255, 60, "images/fps.png") {
+                                         h_x({0.25, 0, 1/5.0, 0}, {0, 200, 0, 100}, 1, 255, 1, "images/h_x.png"),
+                                         scale_x({0.25, 0, 3/5.0, 0}, {0, 200, 0, 100}, 1, 255, 1, "images/scale_x.png"),
+                                         mouse_speed({0.5, 0, 2/5.0, 0}, {0, 200, 0, 100}, 1, 65535, 100, "images/mouse_speed.png"),
+                                         use_mouse({0.5, 0, 4/5.0, 0}, {0, 200, 0, 100}, {"images/no.png", "images/yes.png"}, "images/use_mouse.png"),
+                                         fps({0.75, 0, 1/5.0, 0}, {0, 200, 0, 100}, 0, 255, 60, "images/fps.png"),
+                                         view_fps({0.75, 0, 3/5.0, 0}, {0, 200, 0, 100}, {"images/no.png", "images/yes.png"}, "images/view_fps.png") {
             arr.push_back(&back_but);
             arr.push_back(&h_x);
             arr.push_back(&scale_x);
             arr.push_back(&mouse_speed);
             arr.push_back(&use_mouse);
             arr.push_back(&fps);
+            arr.push_back(&view_fps);
         }
 
         bool ScreenSetting::go(sf::RenderWindow& window) {
@@ -499,6 +517,7 @@ namespace AStrangeLabyrinth {
             mouse_speed.val = Setting::mouse_speed;
             use_mouse.choice = Setting::use_mouse;
             fps.val = Setting::fps;
+            view_fps.choice = Setting::view_fps;
 
             while (true) {
                 while (const std::optional event = window.pollEvent()) {
@@ -519,6 +538,7 @@ namespace AStrangeLabyrinth {
                     Setting::scale_x = scale_x.val;
                     Setting::mouse_speed = mouse_speed.val;
                     Setting::use_mouse = use_mouse.choice == 1;
+                    Setting::view_fps = view_fps.choice == 1;
 
                     window.setFramerateLimit(fps.val);
                     Setting::fps = fps.val;

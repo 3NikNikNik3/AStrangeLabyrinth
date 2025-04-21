@@ -124,7 +124,7 @@ namespace AStrangeLabyrinth {
 
         unsigned short Setting::mouse_speed = 300;
 
-        bool Setting::use_mouse = false;
+        bool Setting::use_mouse = false, Setting::view_fps = false;
 
         void Setting::load() {
             if (std::filesystem::exists("data/setting.data")) {
@@ -135,7 +135,9 @@ namespace AStrangeLabyrinth {
                 fps = file.get();
                 mouse_speed = file.get() * 256 + file.get();
 
-                use_mouse = file.get();
+                uchar q = file.get();
+                use_mouse = q & 1;
+                view_fps = q & 2;
 
                 file.close();
             }
@@ -149,7 +151,7 @@ namespace AStrangeLabyrinth {
 
             file << h_x << scale_x << fps;
             file << (char)(mouse_speed / 256) << (char)(mouse_speed % 256);
-            file << (char)use_mouse;
+            file << (char)(use_mouse | (view_fps << 1));
 
             file.close();
         }
