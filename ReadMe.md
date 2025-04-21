@@ -98,6 +98,8 @@ cursor...
 
 ![fps](images/fps.png) - maximum fps (if 0, there is no limit)
 
+![view fps](images/view_fps.png) - whether to display fps
+
 # *Attention*: Before reading further, I recommend navigating the labyrinth yourself to understand its strangeness!!!
 
 ## What Makes It Unusual
