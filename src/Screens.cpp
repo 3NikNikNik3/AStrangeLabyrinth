@@ -398,6 +398,8 @@ namespace AStrangeLabyrinth {
 
                         if (key->scancode == sf::Keyboard::Scancode::Enter && now_select == 1)
                             now_select = arr.size() - 1;
+                        else if (key->scancode == sf::Keyboard::Scancode::Escape)
+                            return false;
                     }
                     else if (const auto* resized = event->getIf<sf::Event::Resized>())
                         window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {resized->size.x, resized->size.y})));
@@ -524,7 +526,10 @@ namespace AStrangeLabyrinth {
                     if (event->is<sf::Event::Closed>())
                         return true;
                     else if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
-                        keydown(key->scancode);
+                        if (key->scancode == sf::Keyboard::Scancode::Escape)
+                            return false;
+                        else
+                            keydown(key->scancode);
                     }
                     else if (const auto* resized = event->getIf<sf::Event::Resized>())
                         window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {resized->size.x, resized->size.y})));
