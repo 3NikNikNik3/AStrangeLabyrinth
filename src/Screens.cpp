@@ -236,8 +236,7 @@ namespace AStrangeLabyrinth {
                     #ifdef __linux__
                         std::system("xdg-open https://github.com/3NikNikNik3/AStrangeLabyrinth");
                     #elif _WIN32
-                        char* url = "[https://github.com/3NikNikNik3/AStrangeLabyrinth]";
-                        ShellExecute(NULL, NULL, url, NULL, NULL, SW_SHOWNORMAL);
+                        ShellExecute(NULL, NULL, "https://github.com/3NikNikNik3/AStrangeLabyrinth", NULL, NULL, SW_SHOW);
                     #endif
                 }
 
