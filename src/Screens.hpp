@@ -97,7 +97,7 @@ namespace AStrangeLabyrinth {
         };
 
         class ScreenStart : public ScreenWithGUI {
-            GUI::Button play, play_setting, settings, exit;
+            GUI::Button play, play_setting, settings, exit, link;
 
             ScreenDraw main_loop;
 

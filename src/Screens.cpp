@@ -6,9 +6,9 @@
 
 #ifdef __linux__
     #include <cstdio>
+    #include <cstdlib>
 #elif _WIN32
 	#include <windows.h>
-	//#include <commdlg.h>
 #endif
 
 #include "Drawer.hpp"
@@ -186,11 +186,13 @@ namespace AStrangeLabyrinth {
         ScreenStart::ScreenStart() : play({0.5, 0, 0.25, 0}, {0.5, 0, 0.1, 0, true}, "images/play.png"),
                                      play_setting({0.5, 0, 0.45, 0}, {0.5, 0, 0.1, 0, true}, "images/play_setting.png"),
                                      settings({0.5, 0, 0.65, 0}, {0.5, 0, 0.1, 0, true}, "images/settings.png"),
-                                     exit({0.5, 0, 0.85, 0}, {0.5, 0, 0.1, 0, true}, "images/exit.png") {
+                                     exit({0.5, 0, 0.85, 0}, {0.5, 0, 0.1, 0, true}, "images/exit.png"),
+                                     link({1, -25, 1, -25}, {0, 40, 0, 40}, "images/github.png") {
             arr.push_back(&play);
             arr.push_back(&play_setting);
             arr.push_back(&settings);
             arr.push_back(&exit);
+            arr.push_back(&link);
         }
 
         void ScreenStart::go(sf::RenderWindow& window) {
@@ -229,6 +231,15 @@ namespace AStrangeLabyrinth {
 
                 if (exit.active_now())
                     return;
+
+                if (link.active_now()) {
+                    #ifdef __linux__
+                        std::system("xdg-open https://github.com/3NikNikNik3/AStrangeLabyrinth");
+                    #elif _WIN32
+                        char* url = "[https://github.com/3NikNikNik3/AStrangeLabyrinth]";
+                        ShellExecute(NULL, NULL, url, NULL, NULL, SW_SHOWNORMAL);
+                    #endif
+                }
 
                 window.clear({200, 200, 200});
 
