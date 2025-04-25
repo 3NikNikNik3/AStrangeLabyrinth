@@ -187,11 +187,13 @@ namespace AStrangeLabyrinth {
                                      play_setting({0.5, 0, 0.45, 0}, {0.5, 0, 0.1, 0, true}, "images/play_setting.png"),
                                      settings({0.5, 0, 0.65, 0}, {0.5, 0, 0.1, 0, true}, "images/settings.png"),
                                      exit({0.5, 0, 0.85, 0}, {0.5, 0, 0.1, 0, true}, "images/exit.png"),
-                                     link({1, -25, 1, -25}, {0, 40, 0, 40}, "images/github.png") {
+                                     link({1, -25, 1, -25}, {0, 40, 0, 40}, "images/github.png"),
+                                     how_control_but({0, 25, 1, -25}, {0, 40, 0, 40}, "images/keyboard.png") {
             arr.push_back(&play);
             arr.push_back(&play_setting);
             arr.push_back(&settings);
             arr.push_back(&exit);
+            arr.push_back(&how_control_but);
             arr.push_back(&link);
         }
 
@@ -239,6 +241,10 @@ namespace AStrangeLabyrinth {
                         ShellExecute(NULL, NULL, "https://github.com/3NikNikNik3/AStrangeLabyrinth", NULL, NULL, SW_SHOW);
                     #endif
                 }
+
+                if (how_control_but.active_now())
+                    if (how_control.go(window))
+                        return;
 
                 window.clear({200, 200, 200});
 
@@ -669,6 +675,48 @@ namespace AStrangeLabyrinth {
                 window.clear({200, 200, 200});
 
                 draw(window);
+
+                window.display();
+            }
+        }
+
+        // ScreenHowControl
+        ScreenHowControl::ScreenHowControl() : back_but({0, 15, 0, 15}, {0, 20, 0, 20}, "images/back.png"),
+                                               image("images/how_control.png"), sprite(image) {
+            arr.push_back(&back_but);
+
+            //std::cout << sprite.getTexture().getSize().x << ' ' << sprite.getTexture().getSize().y << std::endl;
+        }
+
+        bool ScreenHowControl::go(sf::RenderWindow& window) {
+            sprite.setScale({window.getSize().x / (float)image.getSize().x, window.getSize().y / (float)image.getSize().y});
+
+            while (true) {
+                while (const std::optional event = window.pollEvent())
+                    if (event->is<sf::Event::Closed>())
+                        return true;
+                    else if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
+                        keydown(key->scancode);
+
+                        if (key->scancode == sf::Keyboard::Scancode::Escape)
+                            return false;
+                    } else if (const auto* resized = event->getIf<sf::Event::Resized>()) {
+                        window.setView(sf::View(sf::FloatRect({0.f, 0.f}, {resized->size.x, resized->size.y})));
+
+                        sprite.setScale({window.getSize().x / (float)image.getSize().x, window.getSize().y / (float)image.getSize().y});
+                    }
+                    else if (const auto* but = event->getIf<sf::Event::MouseButtonPressed>())
+                        if (but->button == sf::Mouse::Button::Left)
+                            click(window, but->position.x, but->position.y);
+
+                if (back_but.active_now())
+                    return false;
+
+                window.clear({200, 200, 200});
+                window.draw(sprite);
+
+                draw(window);
+
 
                 window.display();
             }

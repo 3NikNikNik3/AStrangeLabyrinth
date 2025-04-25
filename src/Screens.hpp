@@ -96,14 +96,28 @@ namespace AStrangeLabyrinth {
             void load(std::string from);
         };
 
+        class ScreenHowControl : public ScreenWithGUI {
+            GUI::Button back_but;
+
+            sf::Texture image;
+            sf::Sprite sprite;
+
+        public:
+            ScreenHowControl();
+
+            bool go(sf::RenderWindow& window);
+        };
+
         class ScreenStart : public ScreenWithGUI {
-            GUI::Button play, play_setting, settings, exit, link;
+            GUI::Button play, play_setting, settings, exit, link, how_control_but;
 
             ScreenDraw main_loop;
 
             ScreenPlaySetting play_setting_screen;
 
             ScreenSetting setting_screen;
+
+            ScreenHowControl how_control;
 
         public:
             ScreenStart();
