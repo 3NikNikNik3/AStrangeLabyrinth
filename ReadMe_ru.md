@@ -31,7 +31,7 @@ Linux: Установите зависимости [отсюда](https://www.sf
         libgbm-dev
 
 #### Сборка (начинать в папке с проектом):
-    cmake -Bbuild -G'Unix Make Files' -DCMAKE_BUILD_MODE=Release -Dbuild_static=OFF
+    cmake -Bbuild -G"Unix Makefiles" -DCMAKE_BUILD_MODE=Release -Dbuild_static=OFF
 Если Вам нужно собрать проект со всеми зависимостями внутри (статически), то в `-Dbuild_static`, установите `ON`, это может понадобиться, если, например, Вы хотите использовать собранный проект на другой Windows
 
     cd build

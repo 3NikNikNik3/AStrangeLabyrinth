@@ -31,7 +31,7 @@ Linux: Install dependencies [from here](https://www.sfml-dev.org/tutorials/3.0/g
         libgbm-dev
 
 #### Building (start in the project folder):
-    cmake -Bbuild -G'Unix Make Files' -DCMAKE_BUILD_MODE=Release -Dbuild_static=OFF
+    cmake -Bbuild -G"Unix Makefiles" -DCMAKE_BUILD_MODE=Release -Dbuild_static=OFF
 If you need to build the project with all dependencies included (statically), use `-Dbuild_static=ON`. This may be necessary if, for example, you want to use the built project on another Windows machine.
 
     cd build
